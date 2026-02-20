@@ -2,10 +2,37 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Huaynos Trompeta</title>
+  <title>Acceso Huaynos</title>
 </head>
 <body>
-  <h1>Huaynos para Trompeta 🎺</h1>
-  <p>Proyecto activo</p>
+
+<h2>🎺 Acceso a Huaynos</h2>
+
+<input type="email" id="email" placeholder="Correo"><br><br>
+<input type="password" id="password" placeholder="Contraseña"><br><br>
+
+<button onclick="login()">Ingresar</button>
+
+<p id="msg"></p>
+
+<script type="module">
+  import { auth } from "./firebase.js";
+  import { signInWithEmailAndPassword } from
+    "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+  window.login = function () {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    signInWithEmailAndPassword(auth, email, password)
+      .then(() => {
+        window.location.href = "huayno.html";
+      })
+      .catch(err => {
+        document.getElementById("msg").innerText = "Error de acceso";
+      });
+  }
+</script>
+
 </body>
 </html>
