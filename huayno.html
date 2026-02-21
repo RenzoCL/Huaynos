@@ -42,25 +42,37 @@
     
     #player-container {
       margin-top: 20px;
-      background: #333;
-      padding: 20px;
+      background: #000;
+      padding: 10px;
       border-radius: 10px;
-      border: 1px dashed #555;
+      border: 1px solid #444;
+      min-height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .info-huayno {
-      background: #444;
-      padding: 10px;
-      border-radius: 5px;
+      background: #333;
+      padding: 15px;
+      border-radius: 8px;
       margin: 15px 0;
-      font-size: 1.1rem;
+      border-left: 4px solid #e63946;
+      text-align: left;
     }
+
     .error-box {
       color: #ff6b6b;
-      padding: 15px;
+      padding: 20px;
       border: 1px solid #ff6b6b;
       border-radius: 8px;
       background: rgba(255, 107, 107, 0.1);
+    }
+
+    iframe {
+      border-radius: 8px;
+      width: 100%;
+      aspect-ratio: 16 / 9;
     }
   </style>
 </head>
@@ -84,12 +96,20 @@
   const content = document.getElementById("content");
   const logoutBtn = document.getElementById("logoutBtn");
 
-  // 🆔 IDENTIFICADOR DEL DISPOSITIVO
+  // 🆔 IDENTIFICADOR ÚNICO DEL DISPOSITIVO
   let deviceId = localStorage.getItem("deviceId");
   if (!deviceId) {
     deviceId = crypto.randomUUID();
     localStorage.setItem("deviceId", deviceId);
   }
+
+  // 🎶 DICCIONARIO DE HUAYNOS (Aquí puedes agregar los 80)
+  const baseDeHuaynos = {
+    "1": { titulo: "Valicha", videoId: "hW96xU1Ykps" },
+    "2": { titulo: "Adiós Pueblo de Ayacucho", videoId: "h-fH_0f5e7c" },
+    "3": { titulo: "Vírgenes del Sol", videoId: "u0mY4Y6qN_Y" },
+    // Agrega más aquí... "4": { ... },
+  };
 
   // 🛡️ LÓGICA DE CONTROL
   onAuthStateChanged(auth, async (user) => {
@@ -100,66 +120,65 @@
 
     const sessionRef = doc(db, "sessions", user.uid);
 
-    // 1. Intentar registrar este dispositivo inmediatamente al entrar
+    // 1. Tomar el control de la sesión al entrar
     await registrarEsteDispositivo(sessionRef);
 
-    // 2. Escuchar cambios en la sesión de Firestore en tiempo real
+    // 2. Escuchar cambios en tiempo real
     onSnapshot(sessionRef, (snap) => {
       if (snap.exists()) {
         const activeDevices = snap.data().devices || [];
         
         if (activeDevices.includes(deviceId)) {
-          // Si mi ID está en la lista, muestro el contenido
           mostrarContenido();
         } else {
-          // Si mi ID NO está, es que otro dispositivo tomó el control
-          mostrarBloqueo(sessionRef);
+          ejecutarExpulsion();
         }
       }
     });
   });
 
-  // Función para tomar el control de la sesión
   async function registrarEsteDispositivo(ref) {
     try {
       await setDoc(ref, { devices: [deviceId] }, { merge: false });
     } catch (e) {
-      console.error("Error al registrar dispositivo:", e);
+      console.error("Error de conexión:", e);
     }
   }
 
-  function mostrarBloqueo(ref) {
+  function ejecutarExpulsion() {
     content.innerHTML = `
       <div class="error-box">
-        <p>⚠️ <b>Sesión en otro dispositivo</b></p>
-        <p>Parece que has abierto tu cuenta en otro celular o pestaña.</p>
-        <button id="btnReclamar">Usar en este dispositivo</button>
+        <p>⚠️ <b>Sesión terminada</b></p>
+        <p>Has iniciado sesión en otro dispositivo.</p>
+        <p><i>Saliendo en 2 segundos...</i></p>
       </div>
     `;
     
-    document.getElementById("btnReclamar").onclick = () => {
-      content.innerHTML = "Reclamando acceso...";
-      registrarEsteDispositivo(ref);
-    };
+    // Redirección forzada después de 2 segundos
+    setTimeout(() => {
+      window.location.href = "index.html";
+    }, 2000);
   }
 
   function mostrarContenido() {
     const urlParams = new URLSearchParams(window.location.search);
-    const huaynoId = urlParams.get('id') || "General";
+    const id = urlParams.get('id') || "1"; // Si no hay ID en el QR, carga el 1 por defecto
+    const datos = baseDeHuaynos[id] || { titulo: "Huayno no encontrado", videoId: "" };
 
     content.innerHTML = `
-      <div class="ok">✅ Sesión Autorizada</div>
+      <div class="ok">✅ Acceso Autorizado</div>
       <div class="info-huayno">
-        📖 Estas viendo: <b>Huayno #${huaynoId}</b>
+        🎵 <b>${datos.titulo}</b><br>
+        <small>Nro. de Huayno: #${id}</small>
       </div>
       <div id="player-container">
-        <p style="font-size: 2.5em; margin: 10px 0;">🎺</p>
-        <p>Aquí se cargará el video de YouTube o el audio del huayno.</p>
+        ${datos.videoId ? 
+          `<iframe src="https://www.youtube.com/embed/${datos.videoId}?rel=0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>` 
+          : `<p>Próximamente disponible 🎺</p>`}
       </div>
     `;
   }
 
-  // 🚪 SALIR
   logoutBtn.addEventListener("click", async () => {
     await signOut(auth);
     window.location.href = "index.html";
