@@ -69,7 +69,7 @@ export const baseDeTemas = {
     "72": { titulo: "Madre",                        artista: "Banda Papá Los Herederos Sunicancha",         tonalidad: "Sol menor", videoId: "SQoYQt79FoY", inicio: 23, categoria: "huayno" },
     "73": { titulo: "Mary Se Llama",                artista: "Banda Show La Huaranchal",                    tonalidad: "Sol menor", videoId: "9sYfgALM4IU", inicio: 62, categoria: "huayno" },
     "74": { titulo: "Me Emborracho por tu Amor",    artista: "Banda Show La Huaranchal",                    tonalidad: "Sol menor", videoId: "cglPEIAJo1k", inicio: 29, categoria: "huayno" },
-    "75": { titulo: "Mix Flor Piña",                artista: null,                                          tonalidad: "Sol menor", videoId: null, inicio: 0, categoria: "huayno" },
+    "75": { titulo: "Mix Flor Pileña",              artista: null,                                          tonalidad: "Sol menor", videoId: null, inicio: 0, categoria: "huayno" },
     "76": { titulo: "No Puedo Amarte",              artista: null,                                          tonalidad: "Sol menor", videoId: null, inicio: 0, categoria: "huayno" },
     "77": { titulo: "Otra Vez Me Enamoré",          artista: null,                                          tonalidad: "Sol menor", videoId: null, inicio: 0, categoria: "huayno" },
     "78": { titulo: "Que Linda Flor",               artista: null,                                          tonalidad: "Sol menor", videoId: null, inicio: 0, categoria: "huayno" },
