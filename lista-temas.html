@@ -3,75 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Explorar Temas - Academia</title>
+    <title>Explorar Temas</title>
     <link rel="stylesheet" href="css/estilo.css">
 </head>
 <body>
-    <nav>
-        <a href="home.html" class="btn-nav">⬅ Volver al Menú</a>
-        <h2 id="titulo-categoria" style="margin:0; text-transform: uppercase; font-size: 1.2rem; color: #e63946;">Cargando...</h2>
-    </nav>
+    <div id="lista-wrapper">
+        <nav>
+            <a href="home.html" class="btn-nav">⬅ Volver</a>
+            <h2 id="titulo-cat" style="margin:0; text-transform: uppercase; font-size: 1.1rem;">---</h2>
+        </nav>
 
-    <div class="container">
-        <input type="text" id="buscador" class="buscador" placeholder="🔎 Buscar por título o artista...">
-        
-        <div class="grid-huaynos" id="lista">
-            <p style="text-align:center; color:#666;">Cargando repertorio...</p>
+        <div class="container">
+            <input type="text" id="buscador" class="buscador" placeholder="🔎 Buscar por título o artista...">
+            <div id="lista" class="grid-huaynos"></div>
         </div>
     </div>
 
     <script type="module">
-        // Importamos la base de datos desde la carpeta js
+        import { auth, db } from "./firebase.js";
         import { baseDeTemas } from "./js/temas.js";
+        import { vigilarSesion } from "./js/seguridad.js";
 
-        // 1. Capturamos la categoría desde la URL (ej: ?cat=huayno)
+        // Vigilancia activa en la lista
+        vigilarSesion(auth, db, "lista-wrapper");
+
         const params = new URLSearchParams(window.location.search);
         const catActual = params.get('cat') || 'huayno';
-        
+        document.getElementById("titulo-cat").innerText = catActual;
+
         const listaDiv = document.getElementById("lista");
-        const tituloHeader = document.getElementById("titulo-categoria");
         const buscador = document.getElementById("buscador");
 
-        // 2. Colocamos el nombre de la categoría en el encabezado
-        tituloHeader.innerText = catActual;
-
-        // 3. Función para dibujar los temas en pantalla
         function render(filtro = "") {
             listaDiv.innerHTML = "";
-            
-            // Convertimos el objeto en un Array y filtramos doblemente:
-            // Primero por categoría, luego por lo que el usuario escribe en el buscador
-            const temasFiltrados = Object.keys(baseDeTemas)
+            const filtrados = Object.keys(baseDeTemas)
                 .map(id => ({ id, ...baseDeTemas[id] }))
                 .filter(t => t.categoria === catActual)
-                .filter(t => 
-                    t.titulo.toLowerCase().includes(filtro.toLowerCase()) || 
-                    t.artista.toLowerCase().includes(filtro.toLowerCase())
-                );
+                .filter(t => t.titulo.toLowerCase().includes(filtro.toLowerCase()));
 
-            // Si no hay temas, avisamos al usuario
-            if (temasFiltrados.length === 0) {
-                listaDiv.innerHTML = `
-                    <div style="text-align:center; padding:40px; color:#888;">
-                        <p>No se encontraron temas en <b>${catActual}</b>.</p>
-                    </div>`;
-                return;
-            }
-
-            // Creamos las tarjetas (Cards)
-            temasFiltrados.forEach(t => {
+            filtrados.forEach(t => {
                 const card = document.createElement("a");
-                // Enviamos al reproductor universal con el ID del tema
                 card.href = `reproductor.html?id=${t.id}`;
-                
-                // Generamos la clase de color según la tonalidad (ej: la-menor)
                 const claseColor = t.tonalidad.toLowerCase().replace(/\s+/g, '-');
                 card.className = `card ${claseColor}`;
-                
                 card.innerHTML = `
-                    <div style="display: flex; flex-direction: column;">
+                    <div style="display:flex; flex-direction:column;">
                         <span class="titulo">${t.titulo}</span>
-                        <span style="font-size: 0.75rem; color: #aaa;">${t.artista}</span>
+                        <span style="font-size:0.7rem; color:#888;">${t.artista}</span>
                     </div>
                     <span class="tono-tag">${t.tonalidad !== "N/A" ? t.tonalidad : "Técnica"}</span>
                 `;
@@ -79,12 +57,7 @@
             });
         }
 
-        // 4. Escuchar el buscador en tiempo real
-        buscador.addEventListener("input", (e) => {
-            render(e.target.value);
-        });
-
-        // 5. Primera carga al abrir la página
+        buscador.oninput = (e) => render(e.target.value);
         render();
     </script>
 </body>

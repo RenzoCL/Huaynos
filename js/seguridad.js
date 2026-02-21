@@ -1,7 +1,18 @@
+// js/seguridad.js
 import { signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+// Generar o recuperar un ID único para el navegador actual
+export const getDeviceId = () => {
+    let id = localStorage.getItem("deviceId");
+    if (!id) {
+        id = crypto.randomUUID();
+        localStorage.setItem("deviceId", id);
+    }
+    return id;
+};
 
 export function manejarExpulsion(contenedor, auth) {
-    let seg = 10;
     contenedor.innerHTML = `
         <div class="expulsion-card">
             <h3>🚫 Sesión en uso</h3>
@@ -15,6 +26,7 @@ export function manejarExpulsion(contenedor, auth) {
         </div>
     `;
 
+    let seg = 10;
     const t = setInterval(async () => {
         seg--;
         const span = document.getElementById("segundos-restantes");
@@ -28,11 +40,40 @@ export function manejarExpulsion(contenedor, auth) {
     }, 1000);
 }
 
+// ESTA ES LA FUNCIÓN QUE BLOQUEA TODO
+export function vigilarSesion(auth, db, contenedorId) {
+    const deviceId = getDeviceId();
+
+    auth.onAuthStateChanged(async (user) => {
+        if (user) {
+            const sessionRef = doc(db, "sessions", user.uid);
+
+            // 1. Reclamar este dispositivo como el activo en esta página
+            await setDoc(sessionRef, { 
+                deviceId: deviceId,
+                lastActive: new Date().getTime()
+            }, { merge: true });
+
+            // 2. Escuchar cambios en tiempo real
+            onSnapshot(sessionRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    if (data.deviceId !== deviceId) {
+                        const wrapper = document.getElementById(contenedorId);
+                        manejarExpulsion(wrapper, auth);
+                    }
+                }
+            });
+        } else {
+            // Si no hay usuario y no estamos en index, mandar al login
+            if (!window.location.pathname.includes("index.html")) {
+                window.location.href = "index.html";
+            }
+        }
+    });
+}
+
 export async function globalLogout(auth) {
-    try {
-        await signOut(auth);
-        window.location.href = "index.html";
-    } catch (e) {
-        console.error("Error al salir:", e);
-    }
+    await signOut(auth);
+    window.location.href = "index.html";
 }
