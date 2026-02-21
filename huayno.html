@@ -133,8 +133,8 @@
       tonalidad: "Mi Menor", 
       videoId: "h-fH_0f5e7c", 
       inicio: 0 
-    },
-    // Sigue agregando aquí abajo respetando las comas y llaves
+    }
+    // Agrega más siguiendo el formato...
   };
 
   // 🛡️ LÓGICA DE CONTROL DE ACCESO
@@ -146,10 +146,10 @@
 
     const sessionRef = doc(db, "sessions", user.uid);
 
-    // Tomar control al entrar
+    // Intentar tomar el control al entrar
     await registrarEsteDispositivo(sessionRef);
 
-    // Escuchar cambios
+    // Escuchar cambios en tiempo real
     onSnapshot(sessionRef, (snap) => {
       if (snap.exists()) {
         const activeDevices = snap.data().devices || [];
@@ -168,15 +168,27 @@
     } catch (e) { console.error("Error:", e); }
   }
 
-  function ejecutarExpulsion() {
+  // 🚪 FUNCIÓN DE EXPULSIÓN REAL (Limpiando sesión de Firebase)
+  async function ejecutarExpulsion() {
     content.innerHTML = `
       <div class="error-box">
         <p>⚠️ <b>Sesión terminada</b></p>
-        <p>Se ha iniciado sesión en otro dispositivo.</p>
-        <p>Redirigiendo al inicio...</p>
+        <p>Has iniciado sesión en otro dispositivo.</p>
+        <p><i>Cerrando acceso por seguridad...</i></p>
       </div>
     `;
-    setTimeout(() => { window.location.href = "index.html"; }, 2000);
+    
+    try {
+      // Forzamos el cierre de sesión en este dispositivo
+      await signOut(auth);
+      
+      // Esperamos un momento para que el usuario lea el mensaje antes de enviarlo al login
+      setTimeout(() => { 
+        window.location.href = "index.html"; 
+      }, 2500);
+    } catch (e) {
+      window.location.href = "index.html";
+    }
   }
 
   function mostrarContenido() {
