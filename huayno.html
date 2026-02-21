@@ -36,11 +36,7 @@
     }
     button:hover { background: #c12a36; }
     
-    .secondary-btn {
-      background: #444;
-      font-size: 0.9em;
-      margin-top: 20px;
-    }
+    .secondary-btn { background: #444; font-size: 0.9em; margin-top: 20px; }
 
     .ok { color: #4caf50; font-size: 1.2rem; margin-top: 10px; font-weight: bold; }
     
@@ -59,6 +55,13 @@
       margin: 15px 0;
       font-size: 1.1rem;
     }
+    .error-box {
+      color: #ff6b6b;
+      padding: 15px;
+      border: 1px solid #ff6b6b;
+      border-radius: 8px;
+      background: rgba(255, 107, 107, 0.1);
+    }
   </style>
 </head>
 <body>
@@ -75,20 +78,20 @@
   import { auth, db } from "./firebase.js";
   import { onAuthStateChanged, signOut } 
     from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-  import { doc, getDoc, setDoc, onSnapshot } 
+  import { doc, setDoc, onSnapshot } 
     from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
   const content = document.getElementById("content");
   const logoutBtn = document.getElementById("logoutBtn");
 
-  // 🆔 GENERAR ID ÚNICO PARA ESTE NAVEGADOR
+  // 🆔 IDENTIFICADOR DEL DISPOSITIVO
   let deviceId = localStorage.getItem("deviceId");
   if (!deviceId) {
     deviceId = crypto.randomUUID();
     localStorage.setItem("deviceId", deviceId);
   }
 
-  // 🛡️ CONTROL DE ACCESO EN TIEMPO REAL
+  // 🛡️ LÓGICA DE CONTROL
   onAuthStateChanged(auth, async (user) => {
     if (!user) {
       window.location.href = "index.html";
@@ -97,59 +100,67 @@
 
     const sessionRef = doc(db, "sessions", user.uid);
 
-    // Escuchar cambios en la sesión (Si otro dispositivo entra, este se entera)
+    // 1. Intentar registrar este dispositivo inmediatamente al entrar
+    await registrarEsteDispositivo(sessionRef);
+
+    // 2. Escuchar cambios en la sesión de Firestore en tiempo real
     onSnapshot(sessionRef, (snap) => {
       if (snap.exists()) {
         const activeDevices = snap.data().devices || [];
         
         if (activeDevices.includes(deviceId)) {
+          // Si mi ID está en la lista, muestro el contenido
           mostrarContenido();
         } else {
-          // Si este ID ya no está en la lista de Firestore, es porque entró alguien más
-          content.innerHTML = `
-            <div style="color: #ff6b6b; padding: 15px; border: 1px solid #ff6b6b; border-radius: 8px;">
-              <p>⚠️ <b>Sesión terminada</b></p>
-              <p>Has iniciado sesión en otro dispositivo. Solo se permite una pantalla activa.</p>
-              <button onclick="location.reload()">Usar aquí</button>
-            </div>
-          `;
+          // Si mi ID NO está, es que otro dispositivo tomó el control
+          mostrarBloqueo(sessionRef);
         }
-      } else {
-        // Primera vez que entra este usuario o documento vacío
-        registrarDispositivo(sessionRef);
       }
     });
   });
 
-  async function registrarDispositivo(ref) {
-    // Sobreescribe cualquier sesión anterior (Prioridad al nuevo)
-    await setDoc(ref, { devices: [deviceId] });
+  // Función para tomar el control de la sesión
+  async function registrarEsteDispositivo(ref) {
+    try {
+      await setDoc(ref, { devices: [deviceId] }, { merge: false });
+    } catch (e) {
+      console.error("Error al registrar dispositivo:", e);
+    }
   }
 
-  // 🎶 REPRODUCTOR / CONTENIDO
+  function mostrarBloqueo(ref) {
+    content.innerHTML = `
+      <div class="error-box">
+        <p>⚠️ <b>Sesión en otro dispositivo</b></p>
+        <p>Parece que has abierto tu cuenta en otro celular o pestaña.</p>
+        <button id="btnReclamar">Usar en este dispositivo</button>
+      </div>
+    `;
+    
+    document.getElementById("btnReclamar").onclick = () => {
+      content.innerHTML = "Reclamando acceso...";
+      registrarEsteDispositivo(ref);
+    };
+  }
+
   function mostrarContenido() {
     const urlParams = new URLSearchParams(window.location.search);
-    const huaynoId = urlParams.get('id') || "---";
+    const huaynoId = urlParams.get('id') || "General";
 
     content.innerHTML = `
-      <div class="ok">✅ Sesión Activa</div>
+      <div class="ok">✅ Sesión Autorizada</div>
       <div class="info-huayno">
-        📖 Partitura: <b>Huayno #${huaynoId}</b>
+        📖 Estas viendo: <b>Huayno #${huaynoId}</b>
       </div>
       <div id="player-container">
         <p style="font-size: 2.5em; margin: 10px 0;">🎺</p>
-        <p>Reproductor listo. Aquí verás el contenido del huayno correspondiente.</p>
+        <p>Aquí se cargará el video de YouTube o el audio del huayno.</p>
       </div>
     `;
   }
 
-  // 🚪 CIERRE DE SESIÓN
+  // 🚪 SALIR
   logoutBtn.addEventListener("click", async () => {
-    const user = auth.currentUser;
-    if (user) {
-      // Opcional: Podrías limpiar Firestore aquí, pero al cerrar sesión 
-      // Auth de Firebase ya bloquea el acceso.
-    }
     await signOut(auth);
     window.location.href = "index.html";
   });
