@@ -38,7 +38,7 @@
     
     .secondary-btn { background: #444; font-size: 0.9em; margin-top: 20px; }
 
-    .ok { color: #4caf50; font-size: 1.2rem; margin-top: 10px; font-weight: bold; }
+    .ok { color: #4caf50; font-size: 1.1rem; margin-top: 10px; font-weight: bold; }
     
     #player-container {
       margin-top: 20px;
@@ -57,8 +57,19 @@
       padding: 15px;
       border-radius: 8px;
       margin: 15px 0;
-      border-left: 4px solid #e63946;
+      border-left: 5px solid #e63946;
       text-align: left;
+    }
+
+    .tonalidad-tag {
+      background: #e63946;
+      color: white;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.75em;
+      font-weight: bold;
+      display: inline-block;
+      margin-bottom: 5px;
     }
 
     .error-box {
@@ -96,22 +107,37 @@
   const content = document.getElementById("content");
   const logoutBtn = document.getElementById("logoutBtn");
 
-  // 🆔 IDENTIFICADOR ÚNICO DEL DISPOSITIVO
+  // 🆔 ID ÚNICO DEL DISPOSITIVO
   let deviceId = localStorage.getItem("deviceId");
   if (!deviceId) {
     deviceId = crypto.randomUUID();
     localStorage.setItem("deviceId", deviceId);
   }
 
-  // 🎶 DICCIONARIO DE HUAYNOS (Aquí puedes agregar los 80)
+  // 📖 DICCIONARIO DE HUAYNOS (Aquí agregas todos tus temas)
   const baseDeHuaynos = {
-    "1": { titulo: "Valicha", videoId: "hW96xU1Ykps" },
-    "2": { titulo: "Adiós Pueblo de Ayacucho", videoId: "h-fH_0f5e7c" },
-    "3": { titulo: "Vírgenes del Sol", videoId: "u0mY4Y6qN_Y" },
-    // Agrega más aquí... "4": { ... },
+    "1": { 
+      titulo: "Ayer la vi a mi ex", 
+      tonalidad: "La Menor", 
+      videoId: "FTV-9T8b05I", 
+      inicio: 29 
+    },
+    "2": { 
+      titulo: "Valicha", 
+      tonalidad: "Re Menor", 
+      videoId: "hW96xU1Ykps", 
+      inicio: 0 
+    },
+    "3": { 
+      titulo: "Adiós Pueblo de Ayacucho", 
+      tonalidad: "Mi Menor", 
+      videoId: "h-fH_0f5e7c", 
+      inicio: 0 
+    },
+    // Sigue agregando aquí abajo respetando las comas y llaves
   };
 
-  // 🛡️ LÓGICA DE CONTROL
+  // 🛡️ LÓGICA DE CONTROL DE ACCESO
   onAuthStateChanged(auth, async (user) => {
     if (!user) {
       window.location.href = "index.html";
@@ -120,14 +146,13 @@
 
     const sessionRef = doc(db, "sessions", user.uid);
 
-    // 1. Tomar el control de la sesión al entrar
+    // Tomar control al entrar
     await registrarEsteDispositivo(sessionRef);
 
-    // 2. Escuchar cambios en tiempo real
+    // Escuchar cambios
     onSnapshot(sessionRef, (snap) => {
       if (snap.exists()) {
         const activeDevices = snap.data().devices || [];
-        
         if (activeDevices.includes(deviceId)) {
           mostrarContenido();
         } else {
@@ -140,41 +165,38 @@
   async function registrarEsteDispositivo(ref) {
     try {
       await setDoc(ref, { devices: [deviceId] }, { merge: false });
-    } catch (e) {
-      console.error("Error de conexión:", e);
-    }
+    } catch (e) { console.error("Error:", e); }
   }
 
   function ejecutarExpulsion() {
     content.innerHTML = `
       <div class="error-box">
         <p>⚠️ <b>Sesión terminada</b></p>
-        <p>Has iniciado sesión en otro dispositivo.</p>
-        <p><i>Saliendo en 2 segundos...</i></p>
+        <p>Se ha iniciado sesión en otro dispositivo.</p>
+        <p>Redirigiendo al inicio...</p>
       </div>
     `;
-    
-    // Redirección forzada después de 2 segundos
-    setTimeout(() => {
-      window.location.href = "index.html";
-    }, 2000);
+    setTimeout(() => { window.location.href = "index.html"; }, 2000);
   }
 
   function mostrarContenido() {
     const urlParams = new URLSearchParams(window.location.search);
-    const id = urlParams.get('id') || "1"; // Si no hay ID en el QR, carga el 1 por defecto
-    const datos = baseDeHuaynos[id] || { titulo: "Huayno no encontrado", videoId: "" };
+    const id = urlParams.get('id') || "1"; 
+    const datos = baseDeHuaynos[id] || { titulo: "No disponible", tonalidad: "-", videoId: "", inicio: 0 };
 
     content.innerHTML = `
-      <div class="ok">✅ Acceso Autorizado</div>
+      <div class="ok">✅ Sesión Autorizada</div>
+      
       <div class="info-huayno">
+        <span class="tonalidad-tag">Tonalidad: ${datos.tonalidad}</span><br>
         🎵 <b>${datos.titulo}</b><br>
-        <small>Nro. de Huayno: #${id}</small>
+        <small style="color: #aaa;">Nro. de Huayno: #${id}</small>
       </div>
+
       <div id="player-container">
         ${datos.videoId ? 
-          `<iframe src="https://www.youtube.com/embed/${datos.videoId}?rel=0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>` 
-          : `<p>Próximamente disponible 🎺</p>`}
+          `<iframe src="https://www.youtube.com/embed/${datos.videoId}?start=${datos.inicio}&rel=0" frameborder="0" allowfullscreen></iframe>` 
+          : `<p>Video aún no vinculado 🎺</p>`}
       </div>
     `;
   }
