@@ -76,10 +76,10 @@ nav {
     text-transform: uppercase;
 }
 
-/* --- Lista de Temas (CORREGIDO PARA GRID) --- */
+/* --- Lista de Temas (MAXIMIZADO PARA PC) --- */
 .container { 
-    padding: 20px; 
-    max-width: 1200px; /* Aumentado para que quepan más cuadros en PC */
+    padding: 15px; 
+    max-width: 98%; /* Ocupa casi todo el ancho de la pantalla */
     margin: auto; 
 }
 
@@ -92,47 +92,49 @@ nav {
     color: white;
     margin-bottom: 20px;
     box-sizing: border-box;
-    position: sticky; /* Opcional: Buscador siempre visible al bajar */
+    position: sticky;
     top: 70px;
     z-index: 900;
 }
 
 .grid-huaynos {
     display: grid;
-    /* MAGIA AQUÍ: Crea columnas automáticas según el ancho de pantalla */
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 15px;
+    /* Ajustado a 145px para forzar más columnas en escritorio */
+    grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
+    gap: 12px;
 }
 
-/* Adaptación para tablets y PCs */
-@media (min-width: 768px) {
+/* Adaptación para pantallas grandes */
+@media (min-width: 1024px) {
     .grid-huaynos {
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 20px;
+        /* En PC los cuadros pueden ser un poco más compactos para ganar columnas */
+        grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+        gap: 15px;
     }
 }
 
 .card {
     display: flex;
-    flex-direction: column; /* Cambiado de row a column para estilo cuadro */
+    flex-direction: column; 
     justify-content: space-between;
     align-items: flex-start;
-    padding: 15px;
+    padding: 12px;
     background: #222;
-    border-radius: 12px;
+    border-radius: 10px;
     text-decoration: none;
     color: white;
-    border-left: 5px solid #444;
+    border-left: 4px solid #444;
     transition: 0.2s;
-    min-height: 110px; /* Altura mínima para uniformidad */
+    min-height: 95px; /* Altura más compacta */
 }
 
 .card:hover { 
     background: #2a2a2a; 
-    transform: scale(1.02);
+    transform: scale(1.03);
+    border-color: #fff; /* Brillo sutil al pasar el mouse */
 }
 
-/* Colores por Tonalidad (Mantengo tus colores) */
+/* Colores por Tonalidad */
 .la-menor { border-left-color: #e63946; }
 .mi-menor { border-left-color: #2a9d8f; }
 .re-menor { border-left-color: #457b9d; }
@@ -141,18 +143,20 @@ nav {
 
 .titulo {
     font-weight: bold;
-    font-size: 0.95rem;
-    margin-bottom: 10px;
+    font-size: 0.85rem; /* Letra un poco más pequeña para que no se amontone */
+    margin-bottom: 8px;
     line-height: 1.2;
+    color: #f0f0f0;
 }
 
 .tono-tag {
-    align-self: flex-end; /* Manda la nota a la esquina inferior derecha */
-    font-size: 0.7rem;
+    align-self: flex-end;
+    font-size: 0.65rem;
     background: rgba(255,255,255,0.1);
-    padding: 4px 8px;
+    padding: 3px 6px;
     border-radius: 4px;
     font-weight: bold;
+    color: #ccc;
 }
 
 /* --- Reproductor --- */
