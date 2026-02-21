@@ -16,11 +16,11 @@
       max-width: 500px;
       margin: auto;
       background: #222;
-      padding: 20px;
+      padding: 25px;
       border-radius: 15px;
       box-shadow: 0 4px 15px rgba(0,0,0,0.5);
     }
-    h1 { color: #e63946; margin-bottom: 20px; }
+    h1 { color: #e63946; margin-bottom: 20px; font-size: 1.5rem; }
     
     button {
       padding: 12px 20px;
@@ -32,22 +32,32 @@
       font-weight: bold;
       transition: 0.3s;
       margin: 10px 0;
+      width: 100%;
     }
     button:hover { background: #c12a36; }
     
     .secondary-btn {
       background: #444;
       font-size: 0.9em;
+      margin-top: 20px;
     }
 
-    .blocked { color: #ff6b6b; font-size: 18px; margin-top: 20px; border: 1px solid #ff6b6b; padding: 15px; border-radius: 10px; }
-    .ok { color: #4caf50; font-size: 20px; margin-top: 20px; }
+    .ok { color: #4caf50; font-size: 1.2rem; margin-top: 10px; font-weight: bold; }
     
     #player-container {
       margin-top: 20px;
       background: #333;
       padding: 20px;
       border-radius: 10px;
+      border: 1px dashed #555;
+    }
+
+    .info-huayno {
+      background: #444;
+      padding: 10px;
+      border-radius: 5px;
+      margin: 15px 0;
+      font-size: 1.1rem;
     }
   </style>
 </head>
@@ -56,111 +66,89 @@
 <div class="container">
   <h1>Huaynos para Trompeta 🎺</h1>
   
-  <div id="content">Cargando verificación de seguridad...</div>
+  <div id="content">Verificando acceso...</div>
 
-  <hr style="opacity: 0.2; margin: 20px 0;">
-  <button class="secondary-btn" id="logoutBtn">Cerrar sesión (Salir)</button>
+  <button class="secondary-btn" id="logoutBtn">Cerrar sesión / Salir</button>
 </div>
 
 <script type="module">
   import { auth, db } from "./firebase.js";
   import { onAuthStateChanged, signOut } 
     from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-  import { doc, getDoc, setDoc, updateDoc } 
+  import { doc, getDoc, setDoc, onSnapshot } 
     from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  const MAX_DEVICES = 1;
   const content = document.getElementById("content");
   const logoutBtn = document.getElementById("logoutBtn");
 
-  // 🆔 IDENTIFICADOR ÚNICO DEL DISPOSITIVO (Navegador actual)
+  // 🆔 GENERAR ID ÚNICO PARA ESTE NAVEGADOR
   let deviceId = localStorage.getItem("deviceId");
   if (!deviceId) {
     deviceId = crypto.randomUUID();
     localStorage.setItem("deviceId", deviceId);
   }
 
-  // 🛡️ CONTROL DE ACCESO
+  // 🛡️ CONTROL DE ACCESO EN TIEMPO REAL
   onAuthStateChanged(auth, async (user) => {
     if (!user) {
       window.location.href = "index.html";
       return;
     }
 
-    try {
-      const ref = doc(db, "sessions", user.uid);
-      const snap = await getDoc(ref);
-      let devices = [];
+    const sessionRef = doc(db, "sessions", user.uid);
 
+    // Escuchar cambios en la sesión (Si otro dispositivo entra, este se entera)
+    onSnapshot(sessionRef, (snap) => {
       if (snap.exists()) {
-        devices = snap.data().devices || [];
+        const activeDevices = snap.data().devices || [];
+        
+        if (activeDevices.includes(deviceId)) {
+          mostrarContenido();
+        } else {
+          // Si este ID ya no está en la lista de Firestore, es porque entró alguien más
+          content.innerHTML = `
+            <div style="color: #ff6b6b; padding: 15px; border: 1px solid #ff6b6b; border-radius: 8px;">
+              <p>⚠️ <b>Sesión terminada</b></p>
+              <p>Has iniciado sesión en otro dispositivo. Solo se permite una pantalla activa.</p>
+              <button onclick="location.reload()">Usar aquí</button>
+            </div>
+          `;
+        }
+      } else {
+        // Primera vez que entra este usuario o documento vacío
+        registrarDispositivo(sessionRef);
       }
-
-      // CASO 1: El dispositivo ya está autorizado
-      if (devices.includes(deviceId)) {
-        mostrarContenido();
-        return;
-      }
-
-      // CASO 2: Se excedió el límite (Hay otro dispositivo activo)
-      if (devices.length >= MAX_DEVICES) {
-        content.innerHTML = `
-          <div class="blocked">
-            <p>🚫 <b>Acceso Bloqueado</b></p>
-            <p>Ya tienes una sesión activa en otro celular o computadora.</p>
-            <p style="font-size: 0.8em; color: #aaa;">Si cerraste la ventana sin querer, pulsa el botón de abajo:</p>
-            <button id="forceAccessBtn">Usar en este dispositivo</button>
-          </div>
-        `;
-
-        // Lógica para "Patear" la otra sesión y entrar aquí
-        document.getElementById("forceAccessBtn").onclick = async () => {
-          content.innerHTML = "Liberando cupo...";
-          await setDoc(ref, { devices: [deviceId] }, { merge: true });
-          location.reload();
-        };
-        return;
-      }
-
-      // CASO 3: Hay cupo libre, registramos este dispositivo
-      devices.push(deviceId);
-      await setDoc(ref, { devices }, { merge: true });
-      mostrarContenido();
-
-    } catch (error) {
-      console.error(error);
-      content.innerHTML = `<p class="blocked">Error de conexión con la base de datos.</p>`;
-    }
+    });
   });
+
+  async function registrarDispositivo(ref) {
+    // Sobreescribe cualquier sesión anterior (Prioridad al nuevo)
+    await setDoc(ref, { devices: [deviceId] });
+  }
 
   // 🎶 REPRODUCTOR / CONTENIDO
   function mostrarContenido() {
     const urlParams = new URLSearchParams(window.location.search);
-    const huaynoId = urlParams.get('id') || "Seleccionado";
+    const huaynoId = urlParams.get('id') || "---";
 
     content.innerHTML = `
-      <div class="ok">✅ Acceso Autorizado</div>
+      <div class="ok">✅ Sesión Activa</div>
+      <div class="info-huayno">
+        📖 Partitura: <b>Huayno #${huaynoId}</b>
+      </div>
       <div id="player-container">
-        <p>Tocando Huayno: <b>#${huaynoId}</b></p>
-        <p style="font-size: 2em;">🎵</p>
-        <p>Aquí se cargará el audio/video protegido.</p>
+        <p style="font-size: 2.5em; margin: 10px 0;">🎺</p>
+        <p>Reproductor listo. Aquí verás el contenido del huayno correspondiente.</p>
       </div>
     `;
   }
 
-  // 🚪 CIERRE DE SESIÓN LIMPIO
+  // 🚪 CIERRE DE SESIÓN
   logoutBtn.addEventListener("click", async () => {
     const user = auth.currentUser;
     if (user) {
-      try {
-        const ref = doc(db, "sessions", user.uid);
-        const snap = await getDoc(ref);
-        if (snap.exists()) {
-          let devices = snap.data().devices || [];
-          devices = devices.filter(d => d !== deviceId); // Quitamos SOLO este dispositivo
-          await updateDoc(ref, { devices });
-        }
-      } catch (e) { console.log("Error al limpiar dispositivo"); }
+      // Opcional: Podrías limpiar Firestore aquí, pero al cerrar sesión 
+      // Auth de Firebase ya bloquea el acceso.
     }
     await signOut(auth);
     window.location.href = "index.html";
