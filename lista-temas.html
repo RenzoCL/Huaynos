@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Explorar Temas</title>
+    <title>Explorar Temas - Ripper</title>
     <link rel="stylesheet" href="css/estilo.css">
 </head>
 <body>
@@ -36,22 +36,63 @@
 
         function render(filtro = "") {
             listaDiv.innerHTML = "";
-            const filtrados = Object.keys(baseDeTemas)
+
+            // 1. Definimos el orden de las notas musicales
+            const ordenNotas = { "do": 1, "re": 2, "mi": 3, "fa": 4, "sol": 5, "la": 6, "si": 7 };
+
+            // 2. Procesamos, filtramos y ordenamos la lista
+            const temasFiltrados = Object.keys(baseDeTemas)
                 .map(id => ({ id, ...baseDeTemas[id] }))
                 .filter(t => t.categoria === catActual)
-                .filter(t => t.titulo.toLowerCase().includes(filtro.toLowerCase()));
+                .filter(t => 
+                    t.titulo.toLowerCase().includes(filtro.toLowerCase()) || 
+                    t.artista.toLowerCase().includes(filtro.toLowerCase())
+                )
+                .sort((a, b) => {
+                    const infoA = a.tonalidad.toLowerCase().split(" ");
+                    const infoB = b.tonalidad.toLowerCase().split(" ");
+                    
+                    const notaA = infoA[0];
+                    const modoA = infoA[1] || "mayor";
+                    
+                    const notaB = infoB[0];
+                    const modoB = infoB[1] || "mayor";
 
-            filtrados.forEach(t => {
+                    // PRIORIDAD 1: Nota (Do, Re, Mi...)
+                    if (ordenNotas[notaA] !== ordenNotas[notaB]) {
+                        return (ordenNotas[notaA] || 99) - (ordenNotas[notaB] || 99);
+                    }
+
+                    // PRIORIDAD 2: Modo (Mayor antes que Menor)
+                    if (modoA !== modoB) {
+                        return modoA === "mayor" ? -1 : 1; 
+                    }
+
+                    // PRIORIDAD 3: Alfabeto
+                    return a.titulo.localeCompare(b.titulo);
+                });
+
+            // 3. Verificamos si hay resultados
+            if (temasFiltrados.length === 0) {
+                listaDiv.innerHTML = "<p style='color:#666; text-align:center; padding:20px;'>No se encontraron temas.</p>";
+                return;
+            }
+
+            // 4. Dibujamos las tarjetas
+            temasFiltrados.forEach(t => {
                 const card = document.createElement("a");
                 card.href = `reproductor.html?id=${t.id}`;
-                const claseColor = t.tonalidad.toLowerCase().replace(/\s+/g, '-');
+                
+                // Limpieza de tonalidad para CSS
+                const claseColor = t.tonalidad.toLowerCase().trim().replace(/\s+/g, '-');
                 card.className = `card ${claseColor}`;
+                
                 card.innerHTML = `
                     <div style="display:flex; flex-direction:column;">
                         <span class="titulo">${t.titulo}</span>
                         <span style="font-size:0.7rem; color:#888;">${t.artista}</span>
                     </div>
-                    <span class="tono-tag">${t.tonalidad !== "N/A" ? t.tonalidad : "Técnica"}</span>
+                    <span class="tono-tag">${t.tonalidad}</span>
                 `;
                 listaDiv.appendChild(card);
             });

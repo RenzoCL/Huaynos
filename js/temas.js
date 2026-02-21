@@ -7,7 +7,7 @@ export const baseDeTemas = {
     "5":  { titulo: "Chico Mentiroso",              artista: "Banda Nueva Expresión Pomapata",              tonalidad: "La menor", videoId: "I69F7OT1Jwg", inicio: 340, categoria: "huayno" },
     "6":  { titulo: "Chofercito Carretero",         artista: "Banda Show La Huaranchal",                    tonalidad: "La menor", videoId: "W9h5L96FnWo", inicio: 23, categoria: "huayno" },
     "7":  { titulo: "Collar de Lágrimas",           artista: "Banda Show Filarmónica Star Otuzco",          tonalidad: "La menor", videoId: "AaSC5eeHfyU", inicio: 40, categoria: "huayno" },
-    "8":  { titulo: "Don Mario",                    artista: null,                                          tonalidad: "La menor", videoId: null, inicio: 0, categoria: "huayno" },
+    "8":  { titulo: "Don Mario",                    artista: "Banda Orquesta Santa Cecilia de Cusco",       tonalidad: "La menor", videoId: null, inicio: 0, categoria: "huayno" },
     "9":  { titulo: "Dos Más Por Favor",            artista: "Banda Nueva Expresión Pomapata",              tonalidad: "La menor", videoId: "I69F7OT1Jwg", inicio: 580, categoria: "huayno" },
     "10": { titulo: "En Soledad",                   artista: "Banda Centro Musical Pomapata",               tonalidad: "La menor", videoId: "6DF8IyenqVU", inicio: 0, categoria: "huayno" },
     "11": { titulo: "Hualaycho Bandido",            artista: "Banda Súper Brass",                           tonalidad: "La menor", videoId: "J8KgV4cDCvs", inicio: 19, categoria: "huayno" },
