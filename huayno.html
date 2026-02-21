@@ -44,6 +44,7 @@
       width: 100%; height: 100%;
       z-index: 20;
       background: rgba(0,0,0,0);
+      cursor: default;
     }
 
     /* PANEL DE BOTONES */
@@ -60,13 +61,14 @@
     .btn-control {
       background: #333; color: white; border: none; padding: 15px 5px;
       border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s;
+      -webkit-tap-highlight-color: transparent; /* Evita destello azul en móvil */
     }
 
     .btn-control:active { background: #e63946; transform: scale(0.95); }
     .btn-play { background: #e63946; grid-column: span 2; font-size: 1.2rem; margin-bottom: 5px; }
     .btn-full { grid-column: span 2; background: #444; }
 
-    .expulsion-card { background: #3a1a1a; border: 2px solid #e63946; padding: 30px; border-radius: 15px; }
+    .expulsion-card { background: #3a1a1a; border: 2px solid #e63946; padding: 30px; border-radius: 15px; margin-top: 50px; }
   </style>
 </head>
 <body oncontextmenu="return false;">
@@ -102,27 +104,27 @@
   import { doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
   const baseDeHuaynos = {
-  "1": { titulo: "Ayer la vi a mi ex - Banda Jazz Perú Sunicancha", tonalidad: "La menor", videoId: "FTV-9T8b05I", inicio: 29 },
-  "2": { titulo: "Brindaré Por Ti - Banda Show La Huaranchal", tonalidad: "La menor", videoId: "JfLWXhriLik", inicio: 577 },
-  "3": { titulo: "Cajamarquina - Banda Perú Armonia y Clase (PAC)", tonalidad: "La menor", videoId: "zRM5JhjWxIA", inicio: 16 },
-  "4": { titulo: "Cancer de Amor - Banda Show La Huaranchal", tonalidad: "La menor", videoId: "YuEvQ1O1qTU", inicio: 252 },
-  "5": { titulo: "Chico Mentiroso - Banda Nueva Expresión Pomapata", tonalidad: "La menor", videoId: null, inicio: 0 },
-  "6": { titulo: "Chofercito Carretero - Banda Show La Huaranchal", tonalidad: "La menor", videoId: "W9h5L96FnWo", inicio: 23 },
-  "7": { titulo: "Collar de Lagrimas - Banda Show Filarmonica Star Otuzco", tonalidad: "La menor", videoId: "I69F7OT1Jwg", inicio: 340 },
-  "8": { titulo: "Don Mario", tonalidad: "La menor", videoId: null, inicio: 0 },
-  "9": { titulo: "Dos Mas Por Favor - Banda Nueva Expresión Pomapata", tonalidad: "La menor", videoId: "I69F7OT1Jwg", inicio: 580 },
-  "10": { titulo: "En Soledad - Banda Centro Musical Pomapata", tonalidad: "La menor", videoId: "6DF8IyenqVU", inicio: 0 },
-  "11": { titulo: "Hualaycho Bandido - Banda Super Brass", tonalidad: "La menor", videoId: "J8KgV4cDCvs", inicio: 19 },
-  "12": { titulo: "Madre - Banda Son Perú", tonalidad: "La menor", videoId: "9_-Go4N2iiI", inicio: 41 },
-  "13": { titulo: "Mala Tu - Banda Perú Armonía y Clase (PAC)", tonalidad: "La menor", videoId: "uigYOd4EwY4", inicio: 204 },
-  "14": { titulo: "Me Marcharé - Banda Santa Cecilia Carabamba", tonalidad: "La menor", videoId: "SYQcSo02J0w", inicio: 29 },
-  "15": { titulo: "Mi Barrio La Soledad - Banda Nueva Expresión Pomapata", tonalidad: "La menor", videoId: "I69F7OT1Jwg", inicio: 18 },
-  "16": { titulo: "Mix Flor Pileña", tonalidad: "La menor", videoId: null, inicio: 0 },
-  "17": { titulo: "No Se Puede Morir de Amor - Banda Show La Nueva Huaranchal", tonalidad: "La menor", videoId: "bomfZf_7GgQ", inicio: 22 },
-  "18": { titulo: "Otra Vez Me Enamoré - Banda Monumental de Otuzco", tonalidad: "La menor", videoId: "PLm37Vp6G34", inicio: 70 },
-  "19": { titulo: "Pocos Minutos - Banda Orquesta Corazón de Huandoval", tonalidad: "La menor", videoId: "g54QPheDL8M", inicio: 23 },
-  "20": { titulo: "Por el Chiquito - Banda Jazz Perú Sunicancha", tonalidad: "La menor", videoId: "jrnCtIbc6_E", inicio: 189 }
-};
+    "1": { titulo: "Ayer la vi a mi ex - Banda Jazz Perú Sunicancha", tonalidad: "La menor", videoId: "FTV-9T8b05I", inicio: 29 },
+    "2": { titulo: "Brindaré Por Ti - Banda Show La Huaranchal", tonalidad: "La menor", videoId: "JfLWXhriLik", inicio: 577 },
+    "3": { titulo: "Cajamarquina - Banda Perú Armonia y Clase (PAC)", tonalidad: "La menor", videoId: "zRM5JhjWxIA", inicio: 16 },
+    "4": { titulo: "Cancer de Amor - Banda Show La Huaranchal", tonalidad: "La menor", videoId: "YuEvQ1O1qTU", inicio: 252 },
+    "5": { titulo: "Chico Mentiroso - Banda Nueva Expresión Pomapata", tonalidad: "La menor", videoId: null, inicio: 0 },
+    "6": { titulo: "Chofercito Carretero - Banda Show La Huaranchal", tonalidad: "La menor", videoId: "W9h5L96FnWo", inicio: 23 },
+    "7": { titulo: "Collar de Lagrimas - Banda Show Filarmonica Star Otuzco", tonalidad: "La menor", videoId: "I69F7OT1Jwg", inicio: 340 },
+    "8": { titulo: "Don Mario", tonalidad: "La menor", videoId: null, inicio: 0 },
+    "9": { titulo: "Dos Mas Por Favor - Banda Nueva Expresión Pomapata", tonalidad: "La menor", videoId: "I69F7OT1Jwg", inicio: 580 },
+    "10": { titulo: "En Soledad - Banda Centro Musical Pomapata", tonalidad: "La menor", videoId: "6DF8IyenqVU", inicio: 0 },
+    "11": { titulo: "Hualaycho Bandido - Banda Super Brass", tonalidad: "La menor", videoId: "J8KgV4cDCvs", inicio: 19 },
+    "12": { titulo: "Madre - Banda Son Perú", tonalidad: "La menor", videoId: "9_-Go4N2iiI", inicio: 41 },
+    "13": { titulo: "Mala Tu - Banda Perú Armonía y Clase (PAC)", tonalidad: "La menor", videoId: "uigYOd4EwY4", inicio: 204 },
+    "14": { titulo: "Me Marcharé - Banda Santa Cecilia Carabamba", tonalidad: "La menor", videoId: "SYQcSo02J0w", inicio: 29 },
+    "15": { titulo: "Mi Barrio La Soledad - Banda Nueva Expresión Pomapata", tonalidad: "La menor", videoId: "I69F7OT1Jwg", inicio: 18 },
+    "16": { titulo: "Mix Flor Pileña", tonalidad: "La menor", videoId: null, inicio: 0 },
+    "17": { titulo: "No Se Puede Morir de Amor - Banda Show La Nueva Huaranchal", tonalidad: "La menor", videoId: "bomfZf_7GgQ", inicio: 22 },
+    "18": { titulo: "Otra Vez Me Enamoré - Banda Monumental de Otuzco", tonalidad: "La menor", videoId: "PLm37Vp6G34", inicio: 70 },
+    "19": { titulo: "Pocos Minutos - Banda Orquesta Corazón de Huandoval", tonalidad: "La menor", videoId: "g54QPheDL8M", inicio: 23 },
+    "20": { titulo: "Por el Chiquito - Banda Jazz Perú Sunicancha", tonalidad: "La menor", videoId: "jrnCtIbc6_E", inicio: 189 }
+  };
 
   const urlParams = new URLSearchParams(window.location.search);
   const id = urlParams.get('id') || "1";
@@ -147,44 +149,55 @@
     await setDoc(sessionRef, { devices: [deviceId] }, { merge: false });
     onSnapshot(sessionRef, (snap) => {
       if (snap.exists() && !snap.data().devices.includes(deviceId)) {
-        document.getElementById("main-content").innerHTML = `<div class="expulsion-card"><h3>🚫 Sesión en uso</h3></div>`;
+        document.getElementById("main-content").innerHTML = `<div class="expulsion-card"><h3>🚫 Sesión en uso</h3><p>Tu cuenta se ha abierto en otro dispositivo.</p></div>`;
         setTimeout(() => signOut(auth), 2000);
       }
     });
   });
 
   // 3. API YOUTUBE
-  var tag = document.createElement('script');
-  tag.src = "https://www.youtube.com/iframe_api";
-  var firstScriptTag = document.getElementsByTagName('script')[0];
-  firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+  if (huayno.videoId) {
+    var tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
-  window.onYouTubeIframeAPIReady = function() {
-    window.player = new YT.Player('player', {
-      videoId: huayno.videoId,
-      playerVars: {
-        'start': huayno.inicio,
-        'controls': 0,
-        'modestbranding': 1,
-        'rel': 0,
-        'iv_load_policy': 3,
-        'disablekb': 1,
-        'playsinline': 1
-      }
-    });
-  };
+    window.onYouTubeIframeAPIReady = function() {
+      window.player = new YT.Player('player', {
+        videoId: huayno.videoId,
+        playerVars: {
+          'start': huayno.inicio,
+          'controls': 0,
+          'modestbranding': 1,
+          'rel': 0,
+          'iv_load_policy': 3,
+          'disablekb': 1,
+          'playsinline': 1
+        }
+      });
+    };
+  } else {
+    document.getElementById("player").innerHTML = `<div style="padding-top:20%; color:#888;">Video no disponible aún 🎺</div>`;
+  }
 
   window.globalLogout = async () => { await signOut(auth); window.location.href = "index.html"; };
 </script>
 
 <script>
-  // FUNCIONES DE BOTONES (Fuera del modulo para que onclick las vea)
   function togglePlay() {
+    if (!window.player || typeof player.getPlayerState !== 'function') return;
     if (player.getPlayerState() == 1) player.pauseVideo();
     else player.playVideo();
   }
-  function seek(s) { player.seekTo(player.getCurrentTime() + s, true); }
-  function irAlInicio() { player.seekTo(window.inicioActual, true); player.playVideo(); }
+  function seek(s) { 
+    if (!window.player || typeof player.getCurrentTime !== 'function') return;
+    player.seekTo(player.getCurrentTime() + s, true); 
+  }
+  function irAlInicio() { 
+    if (!window.player || typeof player.seekTo !== 'function') return;
+    player.seekTo(window.inicioActual, true); 
+    player.playVideo(); 
+  }
 </script>
 </body>
 </html>
