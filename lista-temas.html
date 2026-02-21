@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explorar Temas</title>
+    <link rel="stylesheet" href="css/estilo.css">
+</head>
+<body>
+    <nav>
+        <a href="home.html" class="btn-nav">⬅ Volver</a>
+        <h2 id="titulo-categoria" style="margin:0; text-transform: uppercase; font-size: 1.2rem;">---</h2>
+    </nav>
+
+    <div class="container">
+        <input type="text" id="buscador" class="buscador" placeholder="🔎 Buscar por título o banda...">
+        <div class="grid-huaynos" id="lista"></div>
+    </div>
+
+    <script type="module">
+        import { baseDeTemas } from "./js/temas.js";
+
+        const params = new URLSearchParams(window.location.search);
+        const catActual = params.get('cat') || 'huayno';
+        
+        const listaDiv = document.getElementById("lista");
+        const tituloHeader = document.getElementById("titulo-categoria");
+        const buscador = document.getElementById("buscador");
+
+        tituloHeader.innerText = catActual;
+
+        function render(filtro = "") {
+            listaDiv.innerHTML = "";
+            
+            // Filtro Maestro: Categoría + Texto del buscador
+            const temasFiltrados = Object.keys(baseDeTemas)
+                .map(id => ({ id, ...baseDeTemas[id] }))
+                .filter(t => t.categoria === catActual)
+                .filter(t => 
+                    t.titulo.toLowerCase().includes(filtro.toLowerCase()) || 
+                    t.artista.toLowerCase().includes(filtro.toLowerCase())
+                );
+
+            if(temasFiltrados.length === 0) {
+                listaDiv.innerHTML = `<p style="color:#666; margin-top:20px;">No hay temas en esta categoría todavía.</p>`;
+                return;
+            }
+
+            temasFiltrados.forEach(t => {
+                const card = document.createElement("a");
+                card.href = `reproductor.html?id=${t.id}`;
+                
+                // Si es un método, ocultamos el color de tonalidad o usamos uno neutro
+                const claseColor = t.categoria === "metodos" ? "metodo-style" : t.tonalidad.toLowerCase().replace(" ", "-");
+                
+                card.className = `card ${claseColor}`;
+                card.innerHTML = `
+                    <span class="tono-tag">${t.tonalidad !== "N/A" ? t.tonalidad : "Técnica"}</span>
+                    <span class="titulo">${t.titulo}</span>
+                    <span style="font-size: 0.7rem; color: #bbb; display: block; margin-top: 5px;">${t.artista}</span>
+                `;
+                listaDiv.appendChild(card);
+            });
+        }
+
+        buscador.addEventListener("input", (e) => render(e.target.value));
+        render();
+    </script>
+</body>
+</html>

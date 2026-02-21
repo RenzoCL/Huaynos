@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estudio - Reproductor</title>
+    <link rel="stylesheet" href="css/estilo.css">
+</head>
+<body>
+    <nav>
+        <button id="btnVolver" class="btn-nav">⬅ Atrás</button>
+        <button id="btnLogOut" class="btn-nav btn-logout">Cerrar Sesión</button>
+    </nav>
+
+    <div class="container" id="app-container">
+        <div class="video-wrapper">
+            <div id="player"></div>
+            <div class="capa-blindada"></div>
+        </div>
+
+        <div id="info-section"></div>
+
+        <div class="controles">
+            <div class="control-row">
+                <button class="btn-skip" onclick="saltar(-10)">-10s</button>
+                <button class="btn-skip" onclick="saltar(-5)">-5s</button>
+                <button class="btn-play" onclick="togglePlay()" id="playBtn">PAUSA</button>
+                <button class="btn-skip" onclick="saltar(5)">+5s</button>
+                <button class="btn-skip" onclick="saltar(10)">+10s</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { auth } from "./firebase.js";
+        import { baseDeTemas } from "./js/temas.js";
+        import { manejarExpulsion, globalLogout } from "./js/seguridad.js";
+
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get('id');
+        const tema = baseDeTemas[id];
+
+        if (!tema) { window.location.href = "home.html"; }
+
+        // Botón Volver dinámico a su categoría
+        document.getElementById("btnVolver").onclick = () => {
+            window.location.href = `lista-temas.html?cat=${tema.categoria}`;
+        };
+
+        // UI Dinámica
+        document.getElementById("info-section").innerHTML = `
+            <div class="info-huayno">
+                <span class="tonalidad-tag">${tema.tonalidad}</span>
+                <span style="color:#e63946; font-size:0.7rem; font-weight:bold; margin-left:10px; text-transform:uppercase;">
+                    Categoría: ${tema.categoria}
+                </span>
+                <div style="font-size:1.3rem; font-weight:bold; margin-top:8px;">${tema.titulo}</div>
+                <div style="color:#999;">🎷 ${tema.artista}</div>
+            </div>
+        `;
+
+        // YouTube API
+        let player;
+        window.onYouTubeIframeAPIReady = () => {
+            player = new YT.Player('player', {
+                videoId: tema.videoId,
+                playerVars: { 
+                    start: tema.inicio, 
+                    controls: 0, 
+                    disablekb: 1, 
+                    rel: 0, 
+                    modestbranding: 1,
+                    iv_load_policy: 3
+                },
+                events: {
+                    'onReady': (event) => event.target.playVideo()
+                }
+            });
+        };
+
+        window.saltar = (seg) => player.seekTo(player.getCurrentTime() + seg);
+        window.togglePlay = () => {
+            const state = player.getPlayerState();
+            const btn = document.getElementById("playBtn");
+            if (state === 1) { 
+                player.pauseVideo(); 
+                btn.innerText = "PLAY"; 
+                btn.style.background = "#444";
+            } else { 
+                player.playVideo(); 
+                btn.innerText = "PAUSA"; 
+                btn.style.background = "#e63946";
+            }
+        };
+
+        document.getElementById("btnLogOut").onclick = () => globalLogout(auth);
+    </script>
+    <script src="https://www.youtube.com/iframe_api"></script>
+</body>
+</html>

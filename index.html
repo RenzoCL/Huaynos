@@ -1,50 +1,59 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Huaynos</title>
-    <style>
-      body { font-family: sans-serif; background: #111; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-      .login-box { background: #222; padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); text-align: center; width: 300px; }
-      input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 6px; border: none; box-sizing: border-box; font-size: 16px; background: #333; color: white; }
-      button { width: 100%; padding: 12px; background: #e63946; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 10px; }
-    </style>
-  </head>
-  <body>
-    <div style="position: fixed; top: 10px; right: 10px; font-size: 0.7rem; color: #555; z-index: 9999;">
-      v1.0.2 </div>
-    <div class="login-box">
-      <h2 style="margin-top:0;">Ingreso Alumnos</h2>
-      <input type="email" id="email" placeholder="Correo electrónico">
-      <input type="password" id="password" placeholder="Contraseña">
-      <button id="btnLogin">Entrar</button>
-      <p id="error" style="color: #ff4d4d; font-size: 0.8rem; margin-top: 10px;"></p>
+    <title>Login - Academia de Trompeta</title>
+    <link rel="stylesheet" href="css/estilo.css">
+</head>
+<body class="login-body">
+    <div style="position: fixed; top: 10px; right: 10px; font-size: 0.6rem; color: #444;">v1.0.2</div>
+
+    <div class="login-container">
+        <h1 style="color: #e63946; margin-bottom: 5px;">🎺 ACADEMIA</h1>
+        <p style="color: #888; margin-bottom: 25px; font-size: 0.9rem;">Acceso exclusivo para alumnos</p>
+
+        <div class="login-box">
+            <input type="email" id="email" placeholder="Correo electrónico">
+            <input type="password" id="password" placeholder="Tu contraseña">
+            <button id="btnLogin">ENTRAR AL SISTEMA</button>
+            <div id="error-msg" style="color: #e63946; font-size: 0.8rem; margin-top: 15px; display: none;">
+                Credenciales incorrectas
+            </div>
+        </div>
     </div>
 
     <script type="module">
-      import { auth } from "./firebase.js";
-      import { signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { auth } from "./firebase.js";
+        import { signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-      onAuthStateChanged(auth, (user) => {
-        if (user) {
-          const destinoId = localStorage.getItem("proximoHuayno");
-          if (destinoId) {
-            localStorage.removeItem("proximoHuayno");
-            window.location.replace(`huayno.html?id=${destinoId}`);
-          } else {
-            window.location.replace("home.html");
-          }
-        }
-      });
+        const btnLogin = document.getElementById("btnLogin");
+        const errorMsg = document.getElementById("error-msg");
 
-      document.getElementById("btnLogin").onclick = async () => {
-        const errorMsg = document.getElementById("error");
-        errorMsg.innerText = "Validando...";
-        try {
-          await signInWithEmailAndPassword(auth, document.getElementById("email").value, document.getElementById("password").value);
-        } catch (e) { errorMsg.innerText = "Datos incorrectos"; }
-      };
+        // 1. SI YA ESTÁ LOGUEADO, ENVIAR AL NUEVO HOME DIRECTAMENTE
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                window.location.replace("home.html"); 
+            }
+        });
+
+        // 2. LÓGICA DE LOGIN
+        btnLogin.onclick = async () => {
+            const email = document.getElementById("email").value;
+            const pass = document.getElementById("password").value;
+
+            btnLogin.innerText = "VERIFICANDO...";
+            errorMsg.style.display = "none";
+
+            try {
+                await signInWithEmailAndPassword(auth, email, pass);
+                // El onAuthStateChanged se encargará de la redirección
+            } catch (error) {
+                btnLogin.innerText = "ENTRAR AL SISTEMA";
+                errorMsg.style.display = "block";
+                console.error("Error de login:", error.message);
+            }
+        };
     </script>
-  </body>
+</body>
 </html>

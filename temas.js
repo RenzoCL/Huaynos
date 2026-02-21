@@ -1,5 +1,5 @@
-// huaynos.js - Versión 1.0.2
-export const baseDeHuaynos = {
+// js/temas.js
+export const baseDeTemas = {
     "1":  { titulo: "Ayer la vi a mi ex",           artista: "Banda Jazz Perú Sunicancha",                  tonalidad: "La menor", videoId: "FTV-9T8b05I", inicio: 29 },
     "2":  { titulo: "Brindaré Por Ti",              artista: "Banda Show La Huaranchal",                    tonalidad: "La menor", videoId: "JfLWXhriLik", inicio: 577 },
     "3":  { titulo: "Cajamarquina",                 artista: "Banda Perú Armonía y Clase (PAC)",            tonalidad: "La menor", videoId: "zRM5JhjWxIA", inicio: 16 },
