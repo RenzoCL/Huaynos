@@ -3,28 +3,70 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Huaynos para Trompeta 🎺</title>
+  <title>Reproductor - Huaynos 🎺</title>
   <style>
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #111; color: white; padding: 20px; text-align: center; }
-    .container { max-width: 500px; margin: auto; background: #222; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-    h1 { color: #e63946; margin-bottom: 20px; font-size: 1.5rem; }
-    button { padding: 12px 20px; background: #e63946; color: white; border: none; cursor: pointer; border-radius: 5px; font-weight: bold; width: 100%; transition: 0.3s; }
-    button:hover { background: #c12a36; }
-    .secondary-btn { background: #444; font-size: 0.9em; margin-top: 20px; }
-    .info-huayno { background: #333; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 5px solid #e63946; text-align: left; }
-    .tonalidad-tag { background: #e63946; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.75em; font-weight: bold; display: inline-block; margin-bottom: 5px; }
-    .expulsion-card { background: #3a1a1a; border: 2px solid #e63946; padding: 25px; border-radius: 15px; margin-top: 20px; animation: shake 0.5s; }
-    @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-5px);} 75% {transform: translateX(5px);} }
-    #player-container { margin-top: 20px; background: #000; border-radius: 10px; border: 1px solid #444; min-height: 200px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-    iframe { width: 100%; aspect-ratio: 16 / 9; border: none; }
+    body { font-family: 'Segoe UI', sans-serif; background: #111; color: white; margin: 0; text-align: center; }
+    
+    /* BARRA DE NAVEGACIÓN */
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      background: #1a1a1a;
+      border-bottom: 1px solid #333;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    .btn-nav {
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 0.9rem;
+      padding: 8px 15px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .btn-inicio { background: #444; color: white; }
+    .btn-inicio:hover { background: #555; }
+    .btn-logout { background: #e63946; color: white; }
+    .btn-logout:hover { background: #c12a36; }
+
+    /* REPRODUCTOR */
+    .container { max-width: 600px; margin: 20px auto; padding: 20px; box-sizing: border-box; }
+    .info-huayno { 
+      background: #222; padding: 20px; border-radius: 12px; 
+      margin-bottom: 20px; border-left: 6px solid #e63946; text-align: left; 
+    }
+    .tonalidad-tag { 
+      background: #e63946; color: white; padding: 3px 10px; 
+      border-radius: 4px; font-size: 0.8em; font-weight: bold; display: inline-block; margin-bottom: 10px;
+    }
+    .titulo-song { font-size: 1.3rem; margin: 5px 0; font-weight: bold; }
+    #player-container { 
+      background: #000; border-radius: 12px; overflow: hidden; 
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5); aspect-ratio: 16 / 9;
+      display: flex; align-items: center; justify-content: center;
+    }
+    iframe { width: 100%; height: 100%; border: none; }
+
+    /* EXPULSIÓN */
+    .expulsion-card { background: #3a1a1a; border: 2px solid #e63946; padding: 30px; border-radius: 15px; }
   </style>
 </head>
 <body>
 
+<nav>
+  <a href="home.html" class="btn-nav btn-inicio">🏠 Inicio</a>
+  <button onclick="globalLogout()" class="btn-nav btn-logout">Cerrar Sesión</button>
+</nav>
+
 <div class="container">
-  <h1>Huaynos para Trompeta 🎺</h1>
-  <div id="content">Verificando acceso...</div>
-  <button class="secondary-btn" id="logoutBtn">Cerrar sesión / Salir</button>
+  <div id="content">
+    <p>Cargando huayno...</p>
+  </div>
 </div>
 
 <script type="module">
@@ -32,19 +74,14 @@
   import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
   import { doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  const content = document.getElementById("content");
-  const logoutBtn = document.getElementById("logoutBtn");
-
-  // ID de dispositivo único
+  const contentDiv = document.getElementById("content");
   let deviceId = localStorage.getItem("deviceId") || crypto.randomUUID();
   localStorage.setItem("deviceId", deviceId);
+  let expulsando = false;
 
-  let expulsando = false; // Bloqueo de redirección automática
-
-  // Base de datos de Huaynos
   const baseDeHuaynos = {
-    // --- LA MENOR ---
-    "1": { titulo: "Ayer la vi a mi ex", tonalidad: "La menor", videoId: "FTV-9T8b05I", inicio: 29 },
+    // LA MENOR
+    "1": { titulo: "Ayer la vi a mi ex", tonalidad: "La menor", videoId: "FTV-9T8b05I", inicio: 29 }, 
     "2": { titulo: "Brindaré Por Ti", tonalidad: "La menor", videoId: "JfLWXhriLik", inicio: 577 },
     "3": { titulo: "Cajamarquina", tonalidad: "La menor", videoId: "", inicio: 0 },
     "4": { titulo: "Cancer de Amor", tonalidad: "La menor", videoId: "", inicio: 0 },
@@ -69,8 +106,7 @@
     "23": { titulo: "Tomo Con Mi Plata", tonalidad: "La menor", videoId: "", inicio: 0 },
     "24": { titulo: "Viaje de Amor", tonalidad: "La menor", videoId: "", inicio: 0 },
     "25": { titulo: "Vizcachita", tonalidad: "La menor", videoId: "", inicio: 0 },
-
-    // --- MI MENOR ---
+    // MI MENOR
     "26": { titulo: "A Los Filos De Un Cuchillo", tonalidad: "Mi menor", videoId: "", inicio: 0 },
     "27": { titulo: "Busco un Amor", tonalidad: "Mi menor", videoId: "", inicio: 0 },
     "28": { titulo: "Dejame", tonalidad: "Mi menor", videoId: "", inicio: 0 },
@@ -80,7 +116,7 @@
     "32": { titulo: "La Cadena Se Rompió", tonalidad: "Mi menor", videoId: "", inicio: 0 },
     "33": { titulo: "Linda Andahuaylina", tonalidad: "Mi menor", videoId: "", inicio: 0 },
     "34": { titulo: "Linda Huaracina", tonalidad: "Mi menor", videoId: "", inicio: 0 },
-    "35": { titulo: "Mujer Carhuacina (Mi m)", tonalidad: "Mi menor", videoId: "", inicio: 0 },
+    "35": { titulo: "Mujer Carhuacina", tonalidad: "Mi menor", videoId: "", inicio: 0 },
     "36": { titulo: "Pajaro Pajaro Pajaro", tonalidad: "Mi menor", videoId: "", inicio: 0 },
     "37": { titulo: "Perdoname", tonalidad: "Mi menor", videoId: "", inicio: 0 },
     "38": { titulo: "Por Que Me Dices Que Te Vas", tonalidad: "Mi menor", videoId: "", inicio: 0 },
@@ -89,14 +125,13 @@
     "41": { titulo: "Rio Santa", tonalidad: "Mi menor", videoId: "", inicio: 0 },
     "42": { titulo: "Rosaura Lindaura", tonalidad: "Mi menor", videoId: "", inicio: 0 },
     "43": { titulo: "Tomaré Para Olvidarte", tonalidad: "Mi menor", videoId: "", inicio: 0 },
-    "44": { titulo: "Un Domingo Yo La Vi (Mi m)", tonalidad: "Mi menor", videoId: "", inicio: 0 },
+    "44": { titulo: "Un Domingo Yo La Vi", tonalidad: "Mi menor", videoId: "", inicio: 0 },
     "45": { titulo: "Valicha", tonalidad: "Mi menor", videoId: "hW96xU1Ykps", inicio: 0 },
     "46": { titulo: "Yo Nací Solo Para Ti", tonalidad: "Mi menor", videoId: "", inicio: 0 },
-
-    // --- RE MENOR ---
+    // RE MENOR
     "47": { titulo: "Abreme La Puerta", tonalidad: "Re menor", videoId: "", inicio: 0 },
     "48": { titulo: "Amor Por Internet", tonalidad: "Re menor", videoId: "", inicio: 0 },
-    "49": { titulo: "Cajamarquina (Re m)", tonalidad: "Re menor", videoId: "", inicio: 0 },
+    "49": { titulo: "Cajamarquina", tonalidad: "Re menor", videoId: "", inicio: 0 },
     "50": { titulo: "Capitalina", tonalidad: "Re menor", videoId: "", inicio: 0 },
     "51": { titulo: "Como Duele el Corazón", tonalidad: "Re menor", videoId: "", inicio: 0 },
     "52": { titulo: "El Coche de su Madre", tonalidad: "Re menor", videoId: "", inicio: 0 },
@@ -104,118 +139,91 @@
     "54": { titulo: "Lloro Por Tu Amor", tonalidad: "Re menor", videoId: "", inicio: 0 },
     "55": { titulo: "Marchate", tonalidad: "Re menor", videoId: "", inicio: 0 },
     "56": { titulo: "Me Estas Sacando La Vuelta", tonalidad: "Re menor", videoId: "", inicio: 0 },
-    "57": { titulo: "Mujer Carhuacina (Re m)", tonalidad: "Re menor", videoId: "", inicio: 0 },
+    "57": { titulo: "Mujer Carhuacina", tonalidad: "Re menor", videoId: "", inicio: 0 },
     "58": { titulo: "No Me Preguntes Por Ella", tonalidad: "Re menor", videoId: "", inicio: 0 },
     "59": { titulo: "Pasame La Cerveza", tonalidad: "Re menor", videoId: "", inicio: 0 },
     "60": { titulo: "Por Ti", tonalidad: "Re menor", videoId: "", inicio: 0 },
     "61": { titulo: "Soledad", tonalidad: "Re menor", videoId: "", inicio: 0 },
     "62": { titulo: "Todo Empezó Como Jugando", tonalidad: "Re menor", videoId: "", inicio: 0 },
-    "63": { titulo: "Un Domingo Yo La Vi (Re m)", tonalidad: "Re menor", videoId: "", inicio: 0 },
-
-    // --- SOL MENOR ---
+    "63": { titulo: "Un Domingo Yo La Vi", tonalidad: "Re menor", videoId: "", inicio: 0 },
+    // SOL MENOR
     "64": { titulo: "Amigo", tonalidad: "Sol menor", videoId: "", inicio: 0 },
     "65": { titulo: "Aquella Tarde", tonalidad: "Sol menor", videoId: "", inicio: 0 },
-    "66": { titulo: "Brindaré Por Ti (Sol m)", tonalidad: "Sol menor", videoId: "", inicio: 0 },
-    "67": { titulo: "Chofercito Carretero (Sol m)", tonalidad: "Sol menor", videoId: "", inicio: 0 },
-    "68": { titulo: "Don Mario (Sol m)", tonalidad: "Sol menor", videoId: "", inicio: 0 },
-    "69": { titulo: "Hay Niveles (Sol m)", tonalidad: "Sol menor", videoId: "", inicio: 0 },
-    "70": { titulo: "La Cadena Se Rompió (Sol m)", tonalidad: "Sol menor", videoId: "", inicio: 0 },
+    "66": { titulo: "Brindaré Por Ti", tonalidad: "Sol menor", videoId: "", inicio: 0 },
+    "67": { titulo: "Chofercito Carretero", tonalidad: "Sol menor", videoId: "", inicio: 0 },
+    "68": { titulo: "Don Mario", tonalidad: "Sol menor", videoId: "", inicio: 0 },
+    "69": { titulo: "Hay Niveles", tonalidad: "Sol menor", videoId: "", inicio: 0 },
+    "70": { titulo: "La Cadena Se Rompió", tonalidad: "Sol menor", videoId: "", inicio: 0 },
     "71": { titulo: "La Chismosa", tonalidad: "Sol menor", videoId: "", inicio: 0 },
-    "72": { titulo: "Madre (Sol m)", tonalidad: "Sol menor", videoId: "", inicio: 0 },
+    "72": { titulo: "Madre", tonalidad: "Sol menor", videoId: "", inicio: 0 },
     "73": { titulo: "Mary se Llama", tonalidad: "Sol menor", videoId: "", inicio: 0 },
     "74": { titulo: "Me Emborracho Por Tu Amor", tonalidad: "Sol menor", videoId: "", inicio: 0 },
-    "75": { titulo: "Mix Flor Piña (Sol m)", tonalidad: "Sol menor", videoId: "", inicio: 0 },
+    "75": { titulo: "Mix Flor Piña", tonalidad: "Sol menor", videoId: "", inicio: 0 },
     "76": { titulo: "No Puedo Amarte", tonalidad: "Sol menor", videoId: "", inicio: 0 },
-    "77": { titulo: "Otra Vez Me Enamoré (Sol m)", tonalidad: "Sol menor", videoId: "", inicio: 0 },
-    "78": { titulo: "Que Linda Flor (Sol m)", tonalidad: "Sol menor", videoId: "", inicio: 0 },
-    "79": { titulo: "Viaje de Amor (Sol m)", tonalidad: "Sol menor", videoId: "", inicio: 0 },
-    "80": { titulo: "Vizcachita (Sol m)", tonalidad: "Sol menor", videoId: "", inicio: 0 },
+    "77": { titulo: "Otra Vez Me Enamoré", tonalidad: "Sol menor", videoId: "", inicio: 0 },
+    "78": { titulo: "Que Linda Flor", tonalidad: "Sol menor", videoId: "", inicio: 0 },
+    "79": { titulo: "Viaje de Amor", tonalidad: "Sol menor", videoId: "", inicio: 0 },
+    "80": { titulo: "Vizcachita", tonalidad: "Sol menor", videoId: "", inicio: 0 },
     "81": { titulo: "Ya Se Marchó", tonalidad: "Sol menor", videoId: "", inicio: 0 }
   };
 
   onAuthStateChanged(auth, async (user) => {
-    // Solo redirigir si el usuario es null Y no estamos mostrando el mensaje de expulsión
-    if (!user && !expulsando) {
-      window.location.href = "index.html";
-      return;
-    }
+    if (!user && !expulsando) { window.location.href = "index.html"; return; }
     if (!user) return;
 
     const sessionRef = doc(db, "sessions", user.uid);
-
-    // Registramos este dispositivo como el activo
     await setDoc(sessionRef, { devices: [deviceId] }, { merge: false });
 
-    // Escuchamos si alguien más toma el control
     onSnapshot(sessionRef, (snap) => {
-      if (expulsando) return; // Si ya estamos en cuenta regresiva, no hacer nada más
-
-      if (snap.exists()) {
-        const activeDevices = snap.data().devices || [];
-        if (!activeDevices.includes(deviceId)) {
-          ejecutarExpulsion();
-        } else {
-          mostrarContenido();
-        }
+      if (expulsando) return;
+      if (snap.exists() && !snap.data().devices.includes(deviceId)) {
+        ejecutarExpulsion();
+      } else {
+        mostrarContenido();
       }
     });
   });
 
   function ejecutarExpulsion() {
-    expulsando = true; // Frenamos el onAuthStateChanged
-
-    content.innerHTML = `
+    expulsando = true;
+    contentDiv.innerHTML = `
       <div class="expulsion-card">
         <p style="font-size: 3rem; margin: 0;">🚫</p>
-        <h3 style="color: #e63946; margin: 10px 0;">Acceso Restringido</h3>
-        <p style="font-size: 0.95rem; line-height: 1.5;">Tu cuenta se abrió en otro dispositivo.</p>
-        <hr style="border: 0; border-top: 1px solid #555; margin: 15px 0;">
-        <p id="countdown" style="font-weight: bold; color: #e63946; font-size: 1.1rem;">
-          Cerrando sesión en 5 segundos...
-        </p>
+        <h2 style="color: #e63946;">Sesión ocupada</h2>
+        <p>Tu cuenta se abrió en otro dispositivo.</p>
+        <p id="countdown" style="font-weight:bold; color:#e63946;">Saliendo en 5 segundos...</p>
       </div>
     `;
-    
-    let segundos = 5;
-    const timer = setInterval(async () => {
-      segundos--;
-      const countdownEl = document.getElementById("countdown");
-      if (countdownEl) countdownEl.innerText = `Cerrando sesión en ${segundos} segundos...`;
-      
-      if (segundos <= 0) {
-        clearInterval(timer);
-        // SOLO AQUÍ cerramos sesión y redirigimos
-        await signOut(auth);
-        window.location.href = "index.html";
-      }
+    let seg = 5;
+    const t = setInterval(async () => {
+      seg--;
+      if (document.getElementById("countdown")) document.getElementById("countdown").innerText = `Saliendo en ${seg} segundos...`;
+      if (seg <= 0) { clearInterval(t); await signOut(auth); window.location.href = "index.html"; }
     }, 1000);
   }
 
   function mostrarContenido() {
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get('id') || "1"; 
-    const datos = baseDeHuaynos[id] || { titulo: "No disponible", tonalidad: "-", videoId: "", inicio: 0 };
+    const d = baseDeHuaynos[id] || { titulo: "No encontrado", tonalidad: "-", videoId: "" };
 
-    content.innerHTML = `
+    contentDiv.innerHTML = `
       <div class="info-huayno">
-        <span class="tonalidad-tag">Tonalidad: ${datos.tonalidad}</span><br>
-        🎵 <b>${datos.titulo}</b><br>
-        <small style="color: #aaa;">Nro. de Huayno: #${id}</small>
+        <span class="tonalidad-tag">${d.tonalidad}</span>
+        <div class="titulo-song">${d.titulo}</div>
+        <small style="color: #888;">Nro. #${id}</small>
       </div>
       <div id="player-container">
-        ${datos.videoId ? 
-          `<iframe src="https://www.youtube.com/embed/${datos.videoId}?start=${datos.inicio}&rel=0" allowfullscreen></iframe>` 
-          : `<p>Video no vinculado aún 🎺</p>`}
+        ${d.videoId ? `<iframe src="https://www.youtube.com/embed/${d.videoId}?start=${d.inicio}&rel=0&modestbranding=1" allowfullscreen></iframe>` : "<p>Video no vinculado aún 🎺</p>"}
       </div>
     `;
   }
 
-  logoutBtn.addEventListener("click", async () => {
+  window.globalLogout = async () => {
     expulsando = true;
     await signOut(auth);
     window.location.href = "index.html";
-  });
+  };
 </script>
-
 </body>
 </html>

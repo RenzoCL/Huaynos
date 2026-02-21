@@ -3,50 +3,46 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Biblioteca de Huaynos 🎺</title>
+  <title>Biblioteca - Huaynos 🎺</title>
   <style>
     :root { --lam: #ff4d4d; --mim: #4dff88; --rem: #4d94ff; --solm: #ffcc4d; }
-    body { font-family: 'Segoe UI', sans-serif; background: #111; color: white; margin: 0; padding: 20px; text-align: center; }
-    h1 { color: #e63946; margin-bottom: 20px; }
-    .buscador { width: 90%; max-width: 400px; padding: 12px; border-radius: 25px; border: none; margin-bottom: 25px; background: #222; color: white; border: 1px solid #444; }
+    body { font-family: 'Segoe UI', sans-serif; background: #111; color: white; margin: 0; text-align: center; }
     
-    .grid-huaynos { 
-      display: grid; 
-      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); 
-      gap: 12px; max-width: 1000px; margin: auto; 
-    }
+    /* Navbar */
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: #1a1a1a; border-bottom: 1px solid #333; position: sticky; top: 0; z-index: 1000; }
+    .btn-nav { text-decoration: none; font-weight: bold; font-size: 0.85rem; padding: 8px 12px; border-radius: 6px; border: none; cursor: pointer; }
+    .btn-inicio { background: #444; color: white; }
+    .btn-logout { background: #e63946; color: white; }
 
-    .card { 
-      background: #1a1a1a; border-radius: 12px; padding: 15px; cursor: pointer; 
-      transition: 0.2s; border-bottom: 4px solid #444; text-decoration: none; color: white;
-      display: flex; flex-direction: column; height: 80px; justify-content: center;
-    }
-    .card:hover { transform: scale(1.05); background: #252525; }
+    .buscador { width: 90%; max-width: 400px; padding: 12px; border-radius: 25px; border: 1px solid #444; margin: 20px auto; background: #222; color: white; display: block; }
+    
+    .grid-huaynos { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; max-width: 1000px; margin: auto; padding: 0 15px 40px; }
 
-    /* Clases de colores */
-    .la-menor { border-color: var(--lam); }
-    .mi-menor { border-color: var(--mim); }
-    .re-menor { border-color: var(--rem); }
-    .sol-menor { border-color: var(--solm); }
+    .card { background: #1a1a1a; border-radius: 12px; padding: 15px; cursor: pointer; transition: 0.2s; border-bottom: 4px solid #444; text-decoration: none; color: white; display: flex; flex-direction: column; height: 85px; justify-content: center; }
+    .card:hover { transform: scale(1.03); background: #252525; }
 
-    .tono-tag { font-size: 0.7em; font-weight: bold; margin-bottom: 5px; opacity: 0.8; }
+    /* Colores por tono */
+    .la-menor { border-color: var(--lam); } .mi-menor { border-color: var(--mim); }
+    .re-menor { border-color: var(--rem); } .sol-menor { border-color: var(--solm); }
+    .tono-tag { font-size: 0.65em; font-weight: bold; margin-bottom: 5px; opacity: 0.8; text-transform: uppercase; }
     .titulo { font-size: 0.85em; font-weight: 600; line-height: 1.2; }
 
-    /* Estilo para la expulsión igual que en huayno.html */
-    .expulsion-card { background: #3a1a1a; border: 2px solid #e63946; padding: 25px; border-radius: 15px; margin-top: 20px; }
+    .expulsion-card { background: #3a1a1a; border: 2px solid #e63946; padding: 30px; border-radius: 15px; margin: 20px; }
   </style>
 </head>
 <body>
 
-  <h1>Mi Repertorio 🎺</h1>
-  <input type="text" id="buscador" class="buscador" placeholder="🔎 Buscar huayno o tono...">
+<nav>
+  <a href="home.html" class="btn-nav btn-inicio">🏠 Inicio</a>
+  <button onclick="globalLogout()" class="btn-nav btn-logout">Cerrar Sesión</button>
+</nav>
 
-  <div id="main-content">
-    <div class="grid-huaynos" id="lista">
-      </div>
-  </div>
+<h2 style="margin-top:20px;">Mi Repertorio 🎺</h2>
+<input type="text" id="buscador" class="buscador" placeholder="🔎 Buscar huayno o tono...">
 
-  <button onclick="logout()" style="margin-top:40px; background:none; border:none; color:#666; cursor:pointer; text-decoration:underline;">Cerrar Sesión</button>
+<div id="main-content">
+  <div class="grid-huaynos" id="lista"></div>
+</div>
 
 <script type="module">
   import { auth, db } from "./firebase.js";
@@ -61,7 +57,6 @@
   localStorage.setItem("deviceId", deviceId);
   let expulsando = false;
 
-  // --- LA GRAN LISTA DE 81 HUAYNOS ---
   const huaynos = [
     { id: 1, titulo: "Ayer la vi a mi ex", tono: "La menor", clase: "la-menor" },
     { id: 2, titulo: "Brindaré Por Ti", tono: "La menor", clase: "la-menor" },
@@ -120,7 +115,7 @@
     { id: 55, titulo: "Marchate", tono: "Re menor", clase: "re-menor" },
     { id: 56, titulo: "Me Estas Sacando La Vuelta", tono: "Re menor", clase: "re-menor" },
     { id: 57, titulo: "Mujer Carhuacina", tono: "Re menor", clase: "re-menor" },
-    { id: 58, tono: "Re menor", titulo: "No Me Preguntes Por Ella", clase: "re-menor" },
+    { id: 58, titulo: "No Me Preguntes Por Ella", tono: "Re menor", clase: "re-menor" },
     { id: 59, titulo: "Pasame La Cerveza", tono: "Re menor", clase: "re-menor" },
     { id: 60, titulo: "Por Ti", tono: "Re menor", clase: "re-menor" },
     { id: 61, titulo: "Soledad", tono: "Re menor", clase: "re-menor" },
@@ -146,41 +141,27 @@
     { id: 81, titulo: "Ya Se Marchó", tono: "Sol menor", clase: "sol-menor" }
   ];
 
-  // SEGURIDAD Y VIGILANCIA
   onAuthStateChanged(auth, async (user) => {
     if (!user && !expulsando) { window.location.href = "index.html"; return; }
     if (!user) return;
-
     const sessionRef = doc(db, "sessions", user.uid);
     await setDoc(sessionRef, { devices: [deviceId] }, { merge: false });
-
     onSnapshot(sessionRef, (snap) => {
-      if (expulsando) return;
-      if (snap.exists() && !snap.data().devices.includes(deviceId)) {
-        ejecutarExpulsion();
-      }
+      if (!expulsando && snap.exists() && !snap.data().devices.includes(deviceId)) ejecutarExpulsion();
     });
   });
 
   function ejecutarExpulsion() {
     expulsando = true;
-    mainContent.innerHTML = `
-      <div class="expulsion-card">
-        <p style="font-size: 3rem;">🚫</p>
-        <h3>Sesión en uso</h3>
-        <p>Alguien más entró a tu cuenta.</p>
-        <p id="countdown">Saliendo en 5 segundos...</p>
-      </div>
-    `;
+    mainContent.innerHTML = `<div class="expulsion-card"><h3>🚫 Sesión ocupada</h3><p id="countdown">Saliendo en 5 segundos...</p></div>`;
     let seg = 5;
     const t = setInterval(async () => {
       seg--;
-      document.getElementById("countdown").innerText = `Saliendo en ${seg} segundos...`;
+      if(document.getElementById("countdown")) document.getElementById("countdown").innerText = `Saliendo en ${seg} segundos...`;
       if (seg <= 0) { clearInterval(t); await signOut(auth); window.location.href = "index.html"; }
     }, 1000);
   }
 
-  // RENDERIZADO DE LA LISTA
   function render(filtro = "") {
     listaDiv.innerHTML = "";
     const filtrados = huaynos.filter(h => h.titulo.toLowerCase().includes(filtro.toLowerCase()) || h.tono.toLowerCase().includes(filtro.toLowerCase()));
@@ -196,7 +177,7 @@
   buscador.addEventListener("input", (e) => render(e.target.value));
   render();
 
-  window.logout = async () => { expulsando = true; await signOut(auth); window.location.href = "index.html"; };
+  window.globalLogout = async () => { expulsando = true; await signOut(auth); window.location.href = "index.html"; };
 </script>
 </body>
 </html>

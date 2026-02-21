@@ -5,64 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Huaynos 🎺</title>
     <style>
-        body { 
-            font-family: 'Segoe UI', sans-serif; 
-            background: #111; 
-            color: white; 
-            text-align: center; 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .login-card { 
-            max-width: 350px; 
-            width: 90%;
-            background: #222; 
-            padding: 40px 30px; 
-            border-radius: 20px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.7); 
-        }
+        body { font-family: 'Segoe UI', sans-serif; background: #111; color: white; text-align: center; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .login-card { max-width: 350px; width: 90%; background: #222; padding: 40px 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); }
         h2 { color: #e63946; margin-bottom: 10px; font-size: 1.8rem; }
         p { color: #888; margin-bottom: 25px; font-size: 0.9rem; }
-        
-        input { 
-            width: 100%; 
-            padding: 12px; 
-            margin: 10px 0; 
-            border-radius: 8px; 
-            border: 1px solid #444; 
-            background: #333; 
-            color: white; 
-            box-sizing: border-box; 
-            font-size: 1rem;
-        }
-        input:focus {
-            outline: none;
-            border-color: #e63946;
-        }
-        
-        button { 
-            width: 100%; 
-            padding: 12px; 
-            background: #e63946; 
-            color: white; 
-            border: none; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            font-weight: bold; 
-            font-size: 1rem;
-            margin-top: 15px;
-            transition: 0.3s;
-        }
+        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #444; background: #333; color: white; box-sizing: border-box; font-size: 1rem; }
+        input:focus { outline: none; border-color: #e63946; }
+        button { width: 100%; padding: 12px; background: #e63946; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1rem; margin-top: 15px; transition: 0.3s; }
         button:hover { background: #c12a36; transform: translateY(-2px); }
-        
-        #mensaje { 
-            margin-top: 20px; 
-            font-size: 0.85rem; 
-            min-height: 20px;
-        }
+        #mensaje { margin-top: 20px; font-size: 0.85rem; min-height: 20px; }
     </style>
 </head>
 <body>
@@ -70,12 +21,9 @@
 <div class="login-card">
     <h2>Huaynos 🎺</h2>
     <p>Inicia sesión para acceder al repertorio</p>
-    
     <input type="email" id="email" placeholder="Correo electrónico">
     <input type="password" id="password" placeholder="Contraseña">
-    
     <button id="btnLogin">Entrar al Repertorio</button>
-    
     <div id="mensaje"></div>
 </div>
 
@@ -88,45 +36,29 @@
     const btnLogin = document.getElementById("btnLogin");
     const mensaje = document.getElementById("mensaje");
 
-    // 🛡️ REDIRECCIÓN AUTOMÁTICA AL HOME
     onAuthStateChanged(auth, (user) => {
         if (user) {
             mensaje.innerText = "Verificando sesión...";
             mensaje.style.color = "#4caf50";
-            
-            // Esperamos un segundo para evitar conflictos con procesos de cierre de sesión
-            setTimeout(() => {
-                if (auth.currentUser) {
-                    window.location.href = "home.html";
-                }
-            }, 1000);
+            setTimeout(() => { if (auth.currentUser) window.location.href = "home.html"; }, 1000);
         }
     });
 
-    // 🚀 LÓGICA DE LOGIN
     btnLogin.addEventListener("click", async () => {
         const email = emailInput.value.trim();
         const password = passwordInput.value;
-
         if (!email || !password) {
-            mensaje.innerText = "Por favor, completa todos los campos.";
+            mensaje.innerText = "Completa todos los campos.";
             mensaje.style.color = "#ff6b6b";
             return;
         }
-
-        mensaje.innerText = "Cargando...";
-        mensaje.style.color = "#aaa";
-
         try {
             await signInWithEmailAndPassword(auth, email, password);
-            // La redirección la maneja automáticamente el onAuthStateChanged arriba
         } catch (error) {
-            console.error(error);
-            mensaje.innerText = "Error: Correo o contraseña incorrectos.";
+            mensaje.innerText = "Correo o contraseña incorrectos.";
             mensaje.style.color = "#ff6b6b";
         }
     });
 </script>
-
 </body>
 </html>
