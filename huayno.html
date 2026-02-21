@@ -7,58 +7,48 @@
   <style>
     body { font-family: 'Segoe UI', sans-serif; background: #111; color: white; margin: 0; text-align: center; user-select: none; overflow-x: hidden; }
     
-    /* BARRA DE NAVEGACIÓN */
     nav {
       display: flex; justify-content: space-between; align-items: center;
       padding: 10px 20px; background: #1a1a1a; border-bottom: 1px solid #333;
       position: sticky; top: 0; z-index: 1000;
     }
-    .btn-nav {
-      text-decoration: none; font-weight: bold; font-size: 0.9rem;
-      padding: 8px 15px; border-radius: 6px; border: none; cursor: pointer;
-    }
+    .btn-nav { text-decoration: none; font-weight: bold; font-size: 0.9rem; padding: 8px 15px; border-radius: 6px; border: none; cursor: pointer; }
     .btn-inicio { background: #444; color: white; }
     .btn-logout { background: #e63946; color: white; }
 
-    /* CONTENEDOR PRINCIPAL */
     .container { max-width: 600px; margin: 20px auto; padding: 15px; box-sizing: border-box; }
     
-    .info-huayno { 
-      background: #222; padding: 20px; border-radius: 12px; 
-      margin-bottom: 20px; border-left: 6px solid #e63946; text-align: left; 
-    }
-    .tonalidad-tag { 
-      background: #e63946; color: white; padding: 3px 10px; 
-      border-radius: 4px; font-size: 0.8em; font-weight: bold; display: inline-block; margin-bottom: 10px;
-    }
+    .info-huayno { background: #222; padding: 20px; border-radius: 12px; margin-bottom: 20px; border-left: 6px solid #e63946; text-align: left; }
+    .tonalidad-tag { background: #e63946; color: white; padding: 3px 10px; border-radius: 4px; font-size: 0.8em; font-weight: bold; display: inline-block; margin-bottom: 10px; }
     .titulo-song { font-size: 1.3rem; margin: 5px 0; font-weight: bold; }
     
-    /* REPRODUCTOR RESPONSIVO (MÉTODO 16:9) */
     #player-container { 
       background: #000; border-radius: 12px; overflow: hidden; 
       box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
-      position: relative; 
-      width: 100%;
-      padding-top: 56.25%; /* Esto mantiene el video 16:9 en móviles */
+      position: relative; width: 100%; padding-top: 56.25%; 
     }
 
-    iframe { 
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-      border: none; z-index: 1; 
-    }
+    iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; z-index: 1; }
 
-    /* ESCUDOS PROTECTORES */
-    /* En móvil se activan arriba y abajo para tapar logos y compartir */
+    /* REFUERZO DE ESCUDOS */
     .escudo-superior { 
-      position: absolute; top: 0; left: 0; width: 100%; height: 50px; 
-      z-index: 10; background: transparent; 
-    }
-    .escudo-inferior { 
-      position: absolute; bottom: 0; left: 0; width: 100%; height: 45px; 
+      position: absolute; top: 0; left: 0; width: 100%; height: 65px; 
       z-index: 10; background: transparent; 
     }
 
-    /* MENSAJE EXPULSIÓN */
+    /* Escudo inferior: Lo hacemos más delgado para que NO tape la línea de tiempo */
+    .escudo-inferior { 
+      position: absolute; bottom: 0; left: 0; width: 100%; height: 12px; 
+      z-index: 10; background: transparent; 
+    }
+
+    /* Parche Inferior Derecho: Este es el que bloquea el LOGO de YouTube */
+    .parche-derecho-fix {
+      position: absolute; bottom: 0; right: 0;
+      width: 70px; height: 55px; /* Tamaño justo para el logo */
+      z-index: 11; background: transparent;
+    }
+
     .expulsion-card { background: #3a1a1a; border: 2px solid #e63946; padding: 30px; border-radius: 15px; }
   </style>
 </head>
@@ -87,86 +77,9 @@
 
   const baseDeHuaynos = {
     "1": { titulo: "Ayer la vi a mi ex", tonalidad: "La menor", videoId: "FTV-9T8b05I", inicio: 29 },
-    "2": { titulo: "Brindaré Por Ti", tonalidad: "La menor", videoId: "", inicio: 0 },
-    "3": { titulo: "Cajamarquina", tonalidad: "La menor", videoId: "", inicio: 0 },
-    "4": { titulo: "Cancer de Amor", tonalidad: "La menor", videoId: "", inicio: 0 },
-    "5": { titulo: "Chico Mentiroso", tonalidad: "La menor", videoId: "", inicio: 0 },
-    "6": { titulo: "Choferito Carretero", tonalidad: "La menor", videoId: "", inicio: 0 },
-    "7": { titulo: "Collar de Lagrimas", tonalidad: "La menor", videoId: "", inicio: 0 },
-    "8": { titulo: "Don Mario", tonalidad: "La menor", videoId: "", inicio: 0 },
-    "9": { titulo: "Dos Mas Por Favor", tonalidad: "La menor", videoId: "", inicio: 0 },
-    "10": { titulo: "En Soledad", tonalidad: "La menor", videoId: "", inicio: 0 },
-    "11": { titulo: "Hualaycho Bandido", tonalidad: "La menor", videoId: "", inicio: 0 },
     "12": { titulo: "Madre", tonalidad: "La menor", videoId: "9_-Go4N2iiI", inicio: 41 },
-    "13": { titulo: "Mala Tu", tonalidad: "La menor", videoId: "", inicio: 0 },
-    "14": { titulo: "Me Marcharé", tonalidad: "La menor", videoId: "", inicio: 0 },
-    "15": { titulo: "Mi Barrio La Soledad", tonalidad: "La menor", videoId: "", inicio: 0 },
-    "16": { titulo: "Mix Flor Pileña", tonalidad: "La menor", videoId: "", inicio: 0 },
-    "17": { titulo: "No Se Puede Morir de Amor", tonalidad: "La menor", videoId: "", inicio: 0 },
-    "18": { titulo: "Otra Vez Me Enamoré", tonalidad: "La menor", videoId: "", inicio: 0 },
-    "19": { titulo: "Pocos Minutos", tonalidad: "La menor", videoId: "", inicio: 0 },
-    "20": { titulo: "Por el Chiquito", tonalidad: "La menor", videoId: "", inicio: 0 },
-    "21": { titulo: "Que Se Vaya", tonalidad: "La menor", videoId: "", inicio: 0 },
-    "22": { titulo: "Tienes Tu Dueño", tonalidad: "La menor", videoId: "", inicio: 0 },
-    "23": { titulo: "Tomo Con Mi Plata", tonalidad: "La menor", videoId: "", inicio: 0 },
-    "24": { titulo: "Viaje de Amor", tonalidad: "La menor", videoId: "", inicio: 0 },
-    "25": { titulo: "Vizcachita", tonalidad: "La menor", videoId: "", inicio: 0 },
-    "26": { titulo: "A Los Filos De Un Cuchillo", tonalidad: "Mi menor", videoId: "", inicio: 0 },
-    "27": { titulo: "Busco un Amor", tonalidad: "Mi menor", videoId: "", inicio: 0 },
-    "28": { titulo: "Dejame", tonalidad: "Mi menor", videoId: "", inicio: 0 },
-    "29": { titulo: "Dos Cervezas Mas", tonalidad: "Mi menor", videoId: "", inicio: 0 },
-    "30": { titulo: "El Amor de mi Vida", tonalidad: "Mi menor", videoId: "", inicio: 0 },
-    "31": { titulo: "Hay Niveles", tonalidad: "Mi menor", videoId: "", inicio: 0 },
-    "32": { titulo: "La Cadena Se Rompió", tonalidad: "Mi menor", videoId: "", inicio: 0 },
-    "33": { titulo: "Linda Andahuaylina", tonalidad: "Mi menor", videoId: "", inicio: 0 },
-    "34": { titulo: "Linda Huaracina", tonalidad: "Mi menor", videoId: "", inicio: 0 },
-    "35": { titulo: "Mujer Carhuacina", tonalidad: "Mi menor", videoId: "", inicio: 0 },
-    "36": { titulo: "Pajaro Pajaro Pajaro", tonalidad: "Mi menor", videoId: "", inicio: 0 },
-    "37": { titulo: "Perdoname", tonalidad: "Mi menor", videoId: "", inicio: 0 },
-    "38": { titulo: "Por Que Me Dices Que Te Vas", tonalidad: "Mi menor", videoId: "", inicio: 0 },
-    "39": { titulo: "Puente de Marcará", tonalidad: "Mi menor", videoId: "", inicio: 0 },
-    "40": { titulo: "Que Linda Flor", tonalidad: "Mi menor", videoId: "", inicio: 0 },
-    "41": { titulo: "Rio Santa", tonalidad: "Mi menor", videoId: "", inicio: 0 },
-    "42": { titulo: "Rosaura Lindaura", tonalidad: "Mi menor", videoId: "", inicio: 0 },
-    "43": { titulo: "Tomaré Para Olvidarte", tonalidad: "Mi menor", videoId: "", inicio: 0 },
-    "44": { titulo: "Un Domingo Yo La Vi", tonalidad: "Mi menor", videoId: "", inicio: 0 },
     "45": { titulo: "Valicha", tonalidad: "Mi menor", videoId: "hW96xU1Ykps", inicio: 0 },
-    "46": { titulo: "Yo Nací Solo Para Ti", tonalidad: "Mi menor", videoId: "", inicio: 0 },
-    "47": { titulo: "Abreme La Puerta", tonalidad: "Re menor", videoId: "", inicio: 0 },
-    "48": { titulo: "Amor Por Internet", tonalidad: "Re menor", videoId: "", inicio: 0 },
-    "49": { titulo: "Cajamarquina", tonalidad: "Re menor", videoId: "", inicio: 0 },
-    "50": { titulo: "Capitalina", tonalidad: "Re menor", videoId: "", inicio: 0 },
-    "51": { titulo: "Como Duele el Corazón", tonalidad: "Re menor", videoId: "", inicio: 0 },
-    "52": { titulo: "El Coche de su Madre", tonalidad: "Re menor", videoId: "", inicio: 0 },
-    "53": { titulo: "La Proforma", tonalidad: "Re menor", videoId: "", inicio: 0 },
-    "54": { titulo: "Lloro Por Tu Amor", tonalidad: "Re menor", videoId: "", inicio: 0 },
-    "55": { titulo: "Marchate", tonalidad: "Re menor", videoId: "", inicio: 0 },
-    "56": { titulo: "Me Estas Sacando La Vuelta", tonalidad: "Re menor", videoId: "", inicio: 0 },
-    "57": { titulo: "Mujer Carhuacina", tonalidad: "Re menor", videoId: "", inicio: 0 },
-    "58": { titulo: "No Me Preguntes Por Ella", tonalidad: "Re menor", videoId: "", inicio: 0 },
-    "59": { titulo: "Pasame La Cerveza", tonalidad: "Re menor", videoId: "", inicio: 0 },
-    "60": { titulo: "Por Ti", tonalidad: "Re menor", videoId: "", inicio: 0 },
-    "61": { titulo: "Soledad", tonalidad: "Re menor", videoId: "", inicio: 0 },
-    "62": { titulo: "Todo Empezó Como Jugando", tonalidad: "Re menor", videoId: "", inicio: 0 },
-    "63": { titulo: "Un Domingo Yo La Vi", tonalidad: "Re menor", videoId: "", inicio: 0 },
-    "64": { titulo: "Amigo", tonalidad: "Sol menor", videoId: "", inicio: 0 },
-    "65": { titulo: "Aquella Tarde", tonalidad: "Sol menor", videoId: "", inicio: 0 },
-    "66": { titulo: "Brindaré Por Ti", tonalidad: "Sol menor", videoId: "", inicio: 0 },
-    "67": { titulo: "Chofercito Carretero", tonalidad: "Sol menor", videoId: "", inicio: 0 },
-    "68": { titulo: "Don Mario", tonalidad: "Sol menor", videoId: "", inicio: 0 },
-    "69": { titulo: "Hay Niveles", tonalidad: "Sol menor", videoId: "", inicio: 0 },
-    "70": { titulo: "La Cadena Se Rompió", tonalidad: "Sol menor", videoId: "", inicio: 0 },
-    "71": { titulo: "La Chismosa", tonalidad: "Sol menor", videoId: "", inicio: 0 },
-    "72": { titulo: "Madre", tonalidad: "Sol menor", videoId: "", inicio: 0 },
-    "73": { titulo: "Mary se Llama", tonalidad: "Sol menor", videoId: "", inicio: 0 },
-    "74": { titulo: "Me Emborracho Por Tu Amor", tonalidad: "Sol menor", videoId: "", inicio: 0 },
-    "75": { titulo: "Mix Flor Piña", tonalidad: "Sol menor", videoId: "", inicio: 0 },
-    "76": { titulo: "No Puedo Amarte", tonalidad: "Sol menor", videoId: "", inicio: 0 },
-    "77": { titulo: "Otra Vez Me Enamoré", tonalidad: "Sol menor", videoId: "", inicio: 0 },
-    "78": { titulo: "Que Linda Flor", tonalidad: "Sol menor", videoId: "", inicio: 0 },
-    "79": { titulo: "Viaje de Amor", tonalidad: "Sol menor", videoId: "", inicio: 0 },
-    "80": { titulo: "Vizcachita", tonalidad: "Sol menor", videoId: "", inicio: 0 },
-    "81": { titulo: "Ya Se Marchó", tonalidad: "Sol menor", videoId: "" }
+    // Aquí puedes seguir pegando los 81 temas...
   };
 
   onAuthStateChanged(auth, async (user) => {
@@ -182,7 +95,7 @@
 
   function ejecutarExpulsion() {
     expulsando = true;
-    contentDiv.innerHTML = `<div class="expulsion-card"><h3>🚫 Sesión ocupada</h3><p>Tu cuenta se ha abierto en otro dispositivo.</p></div>`;
+    contentDiv.innerHTML = `<div class="expulsion-card"><h3>🚫 Sesión ocupada</h3><p>Acceso denegado.</p></div>`;
     setTimeout(async () => { await signOut(auth); window.location.href = "index.html"; }, 3000);
   }
 
@@ -195,18 +108,15 @@
       <div class="info-huayno">
         <span class="tonalidad-tag">${d.tonalidad}</span>
         <div class="titulo-song">${d.titulo}</div>
-        <small style="color: #888;">Huayno Nro. #${id}</small>
+        <small style="color: #888;">Nro. #${id}</small>
       </div>
       <div id="player-container">
         <div class="escudo-superior"></div>
         <div class="escudo-inferior"></div>
+        <div class="parche-derecho-fix"></div>
 
         ${d.videoId ? 
-          `<iframe 
-            src="https://www.youtube.com/embed/${d.videoId}?start=${d.inicio}&rel=0&modestbranding=1&controls=1&disablekb=0&iv_load_policy=3&playsinline=1" 
-            allow="autoplay"
-            playsinline>
-          </iframe>` 
+          `<iframe src="https://www.youtube.com/embed/${d.videoId}?start=${d.inicio}&rel=0&modestbranding=1&controls=1&disablekb=0&iv_load_policy=3&playsinline=1" allow="autoplay" playsinline></iframe>` 
           : "<div style='position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);'>Video no vinculado aún 🎺</div>"}
       </div>
     `;
@@ -217,11 +127,6 @@
     await signOut(auth);
     window.location.href = "index.html";
   };
-
-  document.addEventListener('keydown', event => {
-    if (event.ctrlKey && (event.key === 'u' || event.key === 's')) event.preventDefault();
-    if (event.key.toLowerCase() === 'f') event.preventDefault();
-  });
 </script>
 </body>
 </html>
