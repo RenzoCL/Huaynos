@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Biblioteca de Huaynos 🎺</title>
+  <style>
+    :root {
+      --lam: #ff4d4d; --mim: #4dff88; --rem: #4d94ff; --solm: #ffcc4d;
+    }
+    body { font-family: 'Segoe UI', sans-serif; background: #111; color: white; margin: 0; padding: 20px; }
+    h1 { text-align: center; color: #e63946; }
+    
+    .buscador { width: 100%; max-width: 500px; margin: 0 auto 20px; display: block; padding: 10px; border-radius: 5px; border: none; }
+
+    .grid-huaynos {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 15px;
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    .card {
+      background: #222;
+      border-radius: 10px;
+      padding: 15px;
+      text-align: center;
+      cursor: pointer;
+      transition: 0.3s;
+      border-bottom: 4px solid #555;
+      text-decoration: none;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .card:hover { transform: translateY(-5px); background: #333; }
+
+    /* Colores por Tonalidad */
+    .card.la-menor { border-color: var(--lam); }
+    .card.mi-menor { border-color: var(--mim); }
+    .card.re-menor { border-color: var(--rem); }
+    .card.sol-menor { border-color: var(--solm); }
+
+    .tonalidad-badge { font-size: 0.7em; font-weight: bold; text-transform: uppercase; margin-bottom: 8px; display: block; }
+    .la-menor .tonalidad-badge { color: var(--lam); }
+    .mi-menor .tonalidad-badge { color: var(--mim); }
+    .re-menor .tonalidad-badge { color: var(--rem); }
+    .sol-menor .tonalidad-badge { color: var(--solm); }
+
+    .titulo { font-size: 0.9em; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+  <h1>Mi Repertorio 🎺</h1>
+  <input type="text" id="buscador" class="buscador" placeholder="Buscar huayno o tonalidad...">
+
+  <div class="grid-huaynos" id="lista">
+    </div>
+
+<script type="module">
+  import { auth } from "./firebase.js";
+  import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+  // Verificación de sesión
+  onAuthStateChanged(auth, (user) => {
+    if (!user) window.location.href = "index.html";
+  });
+
+  // Lista de Huaynos (He resumido algunos, tú completarás los 84)
+  const huaynos = [
+    { id: 1, titulo: "Ayer la vi a mi ex", tono: "La menor", clase: "la-menor" },
+    { id: 2, titulo: "Valicha", tono: "Mi menor", clase: "mi-menor" },
+    { id: 3, titulo: "Abreme La Puerta", tono: "Re menor", clase: "re-menor" },
+    { id: 4, titulo: "Amigo", tono: "Sol menor", clase: "sol-menor" },
+    // Añadir los demás aquí...
+  ];
+
+  const listaDiv = document.getElementById("lista");
+  const buscador = document.getElementById("buscador");
+
+  function render(filtro = "") {
+    listaDiv.innerHTML = "";
+    const filtrados = huaynos.filter(h => 
+      h.titulo.toLowerCase().includes(filtro.toLowerCase()) || 
+      h.tono.toLowerCase().includes(filtro.toLowerCase())
+    );
+
+    filtrados.forEach(h => {
+      const card = document.createElement("a");
+      card.href = `huayno.html?id=${h.id}`;
+      card.className = `card ${h.clase}`;
+      card.innerHTML = `
+        <span class="tonalidad-badge">${h.tono}</span>
+        <span class="titulo">${h.titulo}</span>
+      `;
+      listaDiv.appendChild(card);
+    });
+  }
+
+  buscador.addEventListener("input", (e) => render(e.target.value));
+  render();
+</script>
+</body>
+</html>
