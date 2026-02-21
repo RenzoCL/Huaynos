@@ -180,15 +180,15 @@
             <div class="aviso-importante">
               ⚠️ <strong>Recuerda:</strong> Por seguridad, el acceso está permitido a <b>un solo dispositivo a la vez</b>.
             </div>
-            <p style="margin-top:20px; font-size:0.9rem; color:#888;">Redirigiendo al inicio en 7 segundos...</p>
+            <p style="margin-top:20px; font-size:0.9rem; color:#888;">Redirigiendo al inicio en 10 segundos...</p>
           </div>
         `;
         
-        // TEMPORIZADOR DE 7 SEGUNDOS
+        // TEMPORIZADOR DE 10 SEGUNDOS
         setTimeout(async () => { 
           await signOut(auth); 
           window.location.href = "index.html"; 
-        }, 7000);
+        }, 10000);
       }
     });
   });
