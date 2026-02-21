@@ -10,17 +10,16 @@
 <div id="player"></div>
 <p id="msg"></p>
 
+<button id="logoutBtn" style="display:none;">Cerrar sesión</button>
+
 <script type="module">
   import { auth, db } from "./firebase.js";
-  import { onAuthStateChanged } from
+  import { onAuthStateChanged, signOut } from
     "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
   import { doc, getDoc, setDoc } from
     "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  // =========================
-  // CONFIGURACIÓN
-  // =========================
-  const MAX_DEVICES = 1;
+  const MAX_DEVICES = 2;
 
   // =========================
   // DEVICE ID ÚNICO
@@ -34,8 +33,10 @@
     return id;
   }
 
+  const deviceId = getDeviceId();
+
   // =========================
-  // LEER ID DEL HUAYNO (?id=huayno1)
+  // LEER HUAYNO
   // =========================
   const params = new URLSearchParams(window.location.search);
   const huaynoId = params.get("id");
@@ -46,65 +47,76 @@
   }
 
   // =========================
-  // AUTH + CONTROL DE DISPOSITIVOS
+  // AUTH + CONTROL
   // =========================
   onAuthStateChanged(auth, async (user) => {
     if (!user) {
-      // No logueado → volver al login
       window.location.href = "index.html";
       return;
     }
 
-    const deviceId = getDeviceId();
-    const ref = doc(db, "sessions", user.uid);
-    const snap = await getDoc(ref);
+    try {
+      const ref = doc(db, "sessions", user.uid);
+      const snap = await getDoc(ref);
 
-    let devices = {};
+      let devices = {};
 
-    if (snap.exists()) {
-      devices = snap.data().devices || {};
-    }
+      if (snap.exists()) {
+        devices = snap.data().devices || {};
+      }
 
-    // Si el dispositivo NO está registrado
-    if (!devices[deviceId]) {
-      const count = Object.keys(devices).length;
-
-      if (count >= MAX_DEVICES) {
+      // 🚫 LÍMITE ALCANZADO
+      if (!devices[deviceId] && Object.keys(devices).length >= MAX_DEVICES) {
         document.body.innerHTML = `
           <h2>🚫 Acceso bloqueado</h2>
           <p>Has alcanzado el límite de dispositivos permitidos.</p>
-          <p>Contacta al vendedor.</p>
+          <p>Cierra sesión en otro dispositivo.</p>
         `;
         return;
       }
 
-      // Registrar nuevo dispositivo
-      devices[deviceId] = {
-        lastSeen: Date.now()
+      // Registrar o actualizar dispositivo
+      devices[deviceId] = { lastSeen: Date.now() };
+
+      await setDoc(ref, { devices }, { merge: true });
+
+      // =========================
+      // ACCESO OK
+      // =========================
+      document.getElementById("titulo").innerText =
+        "🎵 Reproduciendo: " + huaynoId;
+
+      document.getElementById("player").innerHTML = `
+        <iframe width="300" height="200"
+          src="https://www.youtube.com/embed/VIDEO_ID"
+          allowfullscreen></iframe>
+      `;
+
+      document.getElementById("logoutBtn").style.display = "block";
+
+      // =========================
+      // CERRAR SESIÓN
+      // =========================
+      document.getElementById("logoutBtn").onclick = async () => {
+        const snap2 = await getDoc(ref);
+        let devices2 = snap2.data().devices || {};
+
+        // ❌ eliminar ESTE dispositivo
+        delete devices2[deviceId];
+
+        await setDoc(ref, { devices: devices2 }, { merge: true });
+
+        await signOut(auth);
+        localStorage.removeItem("device_id");
+
+        window.location.href = "index.html";
       };
-    } else {
-      // Actualizar actividad
-      devices[deviceId].lastSeen = Date.now();
+
+    } catch (e) {
+      document.getElementById("msg").innerText =
+        "❌ Error de conexión. Intenta nuevamente.";
+      console.error(e);
     }
-
-    // Guardar en Firestore
-    await setDoc(ref, { devices }, { merge: true });
-
-    // =========================
-    // ACCESO PERMITIDO
-    // =========================
-    document.getElementById("titulo").innerText =
-      "🎵 Reproduciendo: " + huaynoId;
-
-    // ⚠️ REEMPLAZA VIDEO_ID por el ID real de YouTube
-    document.getElementById("player").innerHTML = `
-      <iframe
-        width="300"
-        height="200"
-        src="https://www.youtube.com/embed/VIDEO_ID"
-        allowfullscreen>
-      </iframe>
-    `;
   });
 </script>
 
