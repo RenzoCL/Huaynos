@@ -1,37 +1,76 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Acceso Huaynos</title>
+  <title>Huaynos para Trompeta 🎺</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .box {
+      background: #222;
+      padding: 25px;
+      border-radius: 10px;
+      width: 300px;
+    }
+    input, button {
+      width: 100%;
+      margin-top: 10px;
+      padding: 10px;
+    }
+    button {
+      background: #e63946;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    .error {
+      color: #ff6b6b;
+      margin-top: 10px;
+    }
+  </style>
 </head>
 <body>
 
-<h2>🎺 Acceso a Huaynos</h2>
-
-<input type="email" id="email" placeholder="Correo"><br><br>
-<input type="password" id="password" placeholder="Contraseña"><br><br>
-
-<button onclick="login()">Ingresar</button>
-
-<p id="msg"></p>
+<div class="box">
+  <h2>Iniciar sesión</h2>
+  <input type="email" id="email" placeholder="Correo">
+  <input type="password" id="password" placeholder="Contraseña">
+  <button onclick="login()">Entrar</button>
+  <div class="error" id="error"></div>
+</div>
 
 <script type="module">
   import { auth } from "./firebase.js";
-  import { signInWithEmailAndPassword } from
-    "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  import { signInWithEmailAndPassword, onAuthStateChanged } 
+    from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-  window.login = function () {
+  const errorDiv = document.getElementById("error");
+
+  window.login = async function () {
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
 
-    signInWithEmailAndPassword(auth, email, password)
-      .then(() => {
-        window.location.href = "huayno.html";
-      })
-      .catch(err => {
-        document.getElementById("msg").innerText = "Error de acceso";
-      });
-  }
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      window.location.href = "huayno.html";
+    } catch (err) {
+      errorDiv.textContent = "Correo o contraseña incorrectos";
+    }
+  };
+
+  // Si ya está logueado, no mostrar login
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      window.location.href = "huayno.html";
+    }
+  });
 </script>
 
 </body>
