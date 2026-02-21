@@ -5,143 +5,56 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Huaynos para Trompeta 🎺</title>
   <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #111;
-      color: white;
-      padding: 20px;
-      text-align: center;
-    }
-    .container {
-      max-width: 500px;
-      margin: auto;
-      background: #222;
-      padding: 25px;
-      border-radius: 15px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-    }
-    h1 { color: #e63946; margin-bottom: 20px; font-size: 1.5rem; }
-    
-    button {
-      padding: 12px 20px;
-      background: #e63946;
-      color: white;
-      border: none;
-      cursor: pointer;
-      border-radius: 5px;
-      font-weight: bold;
-      transition: 0.3s;
-      margin: 10px 0;
-      width: 100%;
-    }
-    button:hover { background: #c12a36; }
-    
-    .secondary-btn { background: #444; font-size: 0.9em; margin-top: 20px; }
-
-    .ok { color: #4caf50; font-size: 1.1rem; margin-top: 10px; font-weight: bold; }
-    
-    #player-container {
-      margin-top: 20px;
-      background: #000;
-      padding: 10px;
-      border-radius: 10px;
-      border: 1px solid #444;
-      min-height: 200px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .info-huayno {
-      background: #333;
-      padding: 15px;
-      border-radius: 8px;
-      margin: 15px 0;
-      border-left: 5px solid #e63946;
-      text-align: left;
-    }
-
-    .tonalidad-tag {
-      background: #e63946;
-      color: white;
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-size: 0.75em;
-      font-weight: bold;
-      display: inline-block;
-      margin-bottom: 5px;
-    }
-
-    .expulsion-card {
-      background: #3a1a1a; 
-      border: 2px solid #e63946; 
-      padding: 25px; 
-      border-radius: 15px; 
-      margin-top: 20px;
-      animation: shake 0.5s;
-    }
-
-    @keyframes shake {
-      0% { transform: translateX(0); }
-      25% { transform: translateX(-5px); }
-      50% { transform: translateX(5px); }
-      75% { transform: translateX(-5px); }
-      100% { transform: translateX(0); }
-    }
-
-    iframe {
-      border-radius: 8px;
-      width: 100%;
-      aspect-ratio: 16 / 9;
-    }
+    body { font-family: 'Segoe UI', sans-serif; background: #111; color: white; padding: 20px; text-align: center; }
+    .container { max-width: 500px; margin: auto; background: #222; padding: 25px; border-radius: 15px; }
+    h1 { color: #e63946; font-size: 1.5rem; }
+    button { padding: 12px; background: #e63946; color: white; border: none; cursor: pointer; border-radius: 5px; width: 100%; font-weight: bold; }
+    .secondary-btn { background: #444; margin-top: 20px; }
+    .info-huayno { background: #333; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 5px solid #e63946; text-align: left; }
+    .tonalidad-tag { background: #e63946; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.75em; }
+    .expulsion-card { background: #3a1a1a; border: 2px solid #e63946; padding: 25px; border-radius: 15px; animation: shake 0.5s; }
+    @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-5px);} 75% {transform: translateX(5px);} }
+    #player-container { margin-top: 20px; background: #000; border-radius: 10px; min-height: 200px; display: flex; align-items: center; justify-content: center; }
+    iframe { width: 100%; aspect-ratio: 16 / 9; border-radius: 8px; }
   </style>
 </head>
 <body>
 
 <div class="container">
   <h1>Huaynos para Trompeta 🎺</h1>
-  <div id="content">Verificando acceso...</div>
-  <button class="secondary-btn" id="logoutBtn">Cerrar sesión / Salir</button>
+  <div id="content">Cargando...</div>
+  <button class="secondary-btn" id="logoutBtn">Cerrar Sesión</button>
 </div>
 
 <script type="module">
   import { auth, db } from "./firebase.js";
-  import { onAuthStateChanged, signOut } 
-    from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-  import { doc, setDoc, onSnapshot } 
-    from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  import { doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
   const content = document.getElementById("content");
   const logoutBtn = document.getElementById("logoutBtn");
 
-  let deviceId = localStorage.getItem("deviceId");
-  if (!deviceId) {
-    deviceId = crypto.randomUUID();
-    localStorage.setItem("deviceId", deviceId);
-  }
+  let deviceId = localStorage.getItem("deviceId") || crypto.randomUUID();
+  localStorage.setItem("deviceId", deviceId);
 
-  // VARIABLE DE CONTROL PARA EVITAR EL BUCLE DE EXPULSIÓN
-  let expulsando = false;
+  let expulsando = false; // Bloqueo de bucle
 
   const baseDeHuaynos = {
     "1": { titulo: "Ayer la vi a mi ex", tonalidad: "La Menor", videoId: "FTV-9T8b05I", inicio: 29 },
-    "2": { titulo: "Valicha", tonalidad: "Re Menor", videoId: "hW96xU1Ykps", inicio: 0 },
-    "3": { titulo: "Adiós Pueblo de Ayacucho", tonalidad: "Mi Menor", videoId: "h-fH_0f5e7c", inicio: 0 }
+    "2": { titulo: "Valicha", tonalidad: "Re Menor", videoId: "hW96xU1Ykps", inicio: 0 }
   };
 
   onAuthStateChanged(auth, async (user) => {
     if (!user) {
-      window.location.href = "index.html";
+      if (!expulsando) window.location.href = "index.html";
       return;
     }
 
     const sessionRef = doc(db, "sessions", user.uid);
-    await registrarEsteDispositivo(sessionRef);
+    await setDoc(sessionRef, { devices: [deviceId] }, { merge: false });
 
-    // ESCUCHAR CAMBIOS
     onSnapshot(sessionRef, (snap) => {
-      // Si ya estamos en proceso de expulsión, ignoramos cualquier otro cambio
-      if (expulsando) return;
+      if (expulsando) return; // Si ya iniciamos expulsión, ignoramos todo
 
       if (snap.exists()) {
         const activeDevices = snap.data().devices || [];
@@ -154,72 +67,51 @@
     });
   });
 
-  async function registrarEsteDispositivo(ref) {
-    try {
-      await setDoc(ref, { devices: [deviceId] }, { merge: false });
-    } catch (e) { console.error(e); }
-  }
-
   async function ejecutarExpulsion() {
-    expulsando = true; // ACTIVAMOS LA PALANCA PARA DETENER EL SNAPSHOT
-
+    expulsando = true;
     content.innerHTML = `
       <div class="expulsion-card">
-        <p style="font-size: 3rem; margin: 0;">🚫</p>
-        <h3 style="color: #e63946; margin: 10px 0;">Acceso Restringido</h3>
-        <p style="font-size: 0.95rem; line-height: 1.5;">
-          Tu cuenta se abrió en <b>otro dispositivo</b>.
-        </p>
-        <p style="color: #aaa; font-size: 0.85rem;">
-          Solo se permite una sesión activa por seguridad.
-        </p>
-        <hr style="border: 0; border-top: 1px solid #555; margin: 15px 0;">
-        <p id="countdown" style="font-weight: bold; color: #e63946;">
-          Regresando al inicio en 5 segundos...
-        </p>
+        <p style="font-size: 3rem;">🚫</p>
+        <h3>Sesión terminada</h3>
+        <p>Tu cuenta se abrió en otro dispositivo.</p>
+        <p id="countdown" style="color: #e63946; font-weight: bold;">Saliendo en 5 segundos...</p>
       </div>
     `;
     
-    try {
-      await signOut(auth); // Cerramos sesión de inmediato
-      
-      let segundos = 5;
-      const timer = setInterval(() => {
-        segundos--;
-        const countdownEl = document.getElementById("countdown");
-        if (countdownEl) countdownEl.innerText = `Regresando al inicio en ${segundos} segundos...`;
-        
-        if (segundos <= 0) {
-          clearInterval(timer);
-          window.location.href = "index.html"; 
-        }
-      }, 1000);
-    } catch (e) {
-      window.location.href = "index.html";
-    }
+    await signOut(auth);
+    
+    let segundos = 5;
+    const timer = setInterval(() => {
+      segundos--;
+      if (document.getElementById("countdown")) {
+        document.getElementById("countdown").innerText = `Saliendo en ${segundos} segundos...`;
+      }
+      if (segundos <= 0) {
+        clearInterval(timer);
+        window.location.href = "index.html";
+      }
+    }, 1000);
   }
 
   function mostrarContenido() {
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get('id') || "1"; 
-    const datos = baseDeHuaynos[id] || { titulo: "No encontrado", tonalidad: "-", videoId: "", inicio: 0 };
+    const datos = baseDeHuaynos[id] || { titulo: "No encontrado", tonalidad: "-", videoId: "" };
 
     content.innerHTML = `
-      <div class="ok">✅ Sesión Autorizada</div>
       <div class="info-huayno">
         <span class="tonalidad-tag">Tonalidad: ${datos.tonalidad}</span><br>
         🎵 <b>${datos.titulo}</b><br>
-        <small style="color: #aaa;">Nro. de Huayno: #${id}</small>
+        <small>Nro. #${id}</small>
       </div>
       <div id="player-container">
-        ${datos.videoId ? 
-          `<iframe src="https://www.youtube.com/embed/${datos.videoId}?start=${datos.inicio}&rel=0" frameborder="0" allowfullscreen></iframe>` 
-          : `<p>Video próximamente 🎺</p>`}
+        ${datos.videoId ? `<iframe src="https://www.youtube.com/embed/${datos.videoId}?start=${datos.inicio || 0}&rel=0" frameborder="0" allowfullscreen></iframe>` : "Video no disponible"}
       </div>
     `;
   }
 
   logoutBtn.addEventListener("click", async () => {
+    expulsando = true;
     await signOut(auth);
     window.location.href = "index.html";
   });
