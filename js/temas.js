@@ -31,7 +31,7 @@ export const baseDeTemas = {
     "29": { titulo: "Dos Cervezas Más",             artista: "Banda Nueva Expresión Pomapata",              tonalidad: "Mi menor", videoId: "wXtriwE3OXw", inicio: 16, categoria: "huayno" },
     "30": { titulo: "El Amor de mi Vida",           artista: "Banda Orquesta JJ Show",                      tonalidad: "Mi menor", videoId: "RSfG7B_Bs40", inicio: 32, categoria: "huayno" },
     "31": { titulo: "Hay Niveles",                  artista: "Banda Show La Huaranchal",                    tonalidad: "Mi menor", videoId: "JfLWXhriLik", inicio: 37, categoria: "huayno" },
-    "32": { titulo: "La Cadena Se Rompió",          artista: "Banda Show La Huaranchal",                    tonalidad: "Mi menor", videoId: "CfD_i6oP7SE", inicio: 23, categoria: "huayno" },
+    "32": { titulo: "La Cadena Se Rompió",          artista: "Banda Arnmonía Anguy",                        tonalidad: "Mi menor", videoId: "CfD_i6oP7SE", inicio: 23, categoria: "huayno" },
     "33": { titulo: "Linda Andahuaylina",           artista: "Banda Show Sinfónica Sunicancha",             tonalidad: "Mi menor", videoId: "1LCDzUq_FQM", inicio: 4, categoria: "huayno" },
     "34": { titulo: "Linda Huaracina",              artista: "Banda Show Filarmónica Llipa",                tonalidad: "Mi menor", videoId: "61L6WUdSI34", inicio: 39, categoria: "huayno" },
     "35": { titulo: "Mujer Carhuacina",             artista: "Banda Show La Huaranchal",                    tonalidad: "Mi menor", videoId: "KH2mZ1yqwjY", inicio: 133, categoria: "huayno" },
