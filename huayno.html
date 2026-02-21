@@ -72,12 +72,22 @@
       margin-bottom: 5px;
     }
 
-    .error-box {
-      color: #ff6b6b;
-      padding: 20px;
-      border: 1px solid #ff6b6b;
-      border-radius: 8px;
-      background: rgba(255, 107, 107, 0.1);
+    /* Estilo para la Alerta de Expulsión */
+    .expulsion-card {
+      background: #3a1a1a; 
+      border: 2px solid #e63946; 
+      padding: 25px; 
+      border-radius: 15px; 
+      margin-top: 20px;
+      animation: shake 0.5s;
+    }
+
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      50% { transform: translateX(5px); }
+      75% { transform: translateX(-5px); }
+      100% { transform: translateX(0); }
     }
 
     iframe {
@@ -114,7 +124,7 @@
     localStorage.setItem("deviceId", deviceId);
   }
 
-  // 📖 DICCIONARIO DE HUAYNOS (Aquí agregas todos tus temas)
+  // 📖 DICCIONARIO DE HUAYNOS (Agregue aquí sus 84+ temas)
   const baseDeHuaynos = {
     "1": { 
       titulo: "Ayer la vi a mi ex", 
@@ -134,10 +144,10 @@
       videoId: "h-fH_0f5e7c", 
       inicio: 0 
     }
-    // Agrega más siguiendo el formato...
+    // Para agregar más: "4": { titulo: "...", tonalidad: "...", videoId: "...", inicio: 0 },
   };
 
-  // 🛡️ LÓGICA DE CONTROL DE ACCESO
+  // 🛡️ CONTROL DE ACCESO
   onAuthStateChanged(auth, async (user) => {
     if (!user) {
       window.location.href = "index.html";
@@ -145,11 +155,8 @@
     }
 
     const sessionRef = doc(db, "sessions", user.uid);
-
-    // Intentar tomar el control al entrar
     await registrarEsteDispositivo(sessionRef);
 
-    // Escuchar cambios en tiempo real
     onSnapshot(sessionRef, (snap) => {
       if (snap.exists()) {
         const activeDevices = snap.data().devices || [];
@@ -165,27 +172,42 @@
   async function registrarEsteDispositivo(ref) {
     try {
       await setDoc(ref, { devices: [deviceId] }, { merge: false });
-    } catch (e) { console.error("Error:", e); }
+    } catch (e) { console.error(e); }
   }
 
-  // 🚪 FUNCIÓN DE EXPULSIÓN REAL (Limpiando sesión de Firebase)
+  // 🚪 FUNCIÓN DE EXPULSIÓN PROFESIONAL
   async function ejecutarExpulsion() {
     content.innerHTML = `
-      <div class="error-box">
-        <p>⚠️ <b>Sesión terminada</b></p>
-        <p>Has iniciado sesión en otro dispositivo.</p>
-        <p><i>Cerrando acceso por seguridad...</i></p>
+      <div class="expulsion-card">
+        <p style="font-size: 3rem; margin: 0;">🚫</p>
+        <h3 style="color: #e63946; margin: 10px 0;">Acceso Restringido</h3>
+        <p style="font-size: 0.95rem; line-height: 1.5;">
+          Tu cuenta se abrió en <b>otro dispositivo</b>.
+        </p>
+        <p style="color: #aaa; font-size: 0.85rem;">
+          Solo se permite una sesión activa por seguridad.
+        </p>
+        <hr style="border: 0; border-top: 1px solid #555; margin: 15px 0;">
+        <p id="countdown" style="font-weight: bold; color: #e63946;">
+          Regresando al inicio en 5 segundos...
+        </p>
       </div>
     `;
     
     try {
-      // Forzamos el cierre de sesión en este dispositivo
-      await signOut(auth);
+      await signOut(auth); // Borra sesión para evitar bucles automáticos
       
-      // Esperamos un momento para que el usuario lea el mensaje antes de enviarlo al login
-      setTimeout(() => { 
-        window.location.href = "index.html"; 
-      }, 2500);
+      let segundos = 5;
+      const timer = setInterval(() => {
+        segundos--;
+        const countdownEl = document.getElementById("countdown");
+        if (countdownEl) countdownEl.innerText = `Regresando al inicio en ${segundos} segundos...`;
+        
+        if (segundos <= 0) {
+          clearInterval(timer);
+          window.location.href = "index.html"; 
+        }
+      }, 1000);
     } catch (e) {
       window.location.href = "index.html";
     }
@@ -194,21 +216,19 @@
   function mostrarContenido() {
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get('id') || "1"; 
-    const datos = baseDeHuaynos[id] || { titulo: "No disponible", tonalidad: "-", videoId: "", inicio: 0 };
+    const datos = baseDeHuaynos[id] || { titulo: "No encontrado", tonalidad: "-", videoId: "", inicio: 0 };
 
     content.innerHTML = `
       <div class="ok">✅ Sesión Autorizada</div>
-      
       <div class="info-huayno">
         <span class="tonalidad-tag">Tonalidad: ${datos.tonalidad}</span><br>
         🎵 <b>${datos.titulo}</b><br>
         <small style="color: #aaa;">Nro. de Huayno: #${id}</small>
       </div>
-
       <div id="player-container">
         ${datos.videoId ? 
           `<iframe src="https://www.youtube.com/embed/${datos.videoId}?start=${datos.inicio}&rel=0" frameborder="0" allowfullscreen></iframe>` 
-          : `<p>Video aún no vinculado 🎺</p>`}
+          : `<p>Video próximamente 🎺</p>`}
       </div>
     `;
   }
