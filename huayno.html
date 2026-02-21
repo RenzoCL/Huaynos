@@ -6,85 +6,24 @@
   <title>Reproductor Pro - Huaynos 🎺</title>
   <style>
     body { font-family: 'Segoe UI', sans-serif; background: #111; color: white; margin: 0; text-align: center; user-select: none; }
-    
-    /* NAVEGACIÓN */
-    nav {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 10px 20px; background: #1a1a1a; border-bottom: 1px solid #333;
-      position: sticky; top: 0; z-index: 1000;
-    }
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: #1a1a1a; border-bottom: 1px solid #333; position: sticky; top: 0; z-index: 1000; }
     .btn-nav { text-decoration: none; font-weight: bold; font-size: 0.9rem; padding: 8px 15px; border-radius: 6px; border: none; cursor: pointer; color: white; background: #444; }
     .btn-logout { background: #e63946; }
-
     .container { max-width: 600px; margin: 20px auto; padding: 15px; box-sizing: border-box; }
-    
-    /* INFO HUAYNO */
     .info-huayno { background: #222; padding: 20px; border-radius: 12px; margin-bottom: 20px; border-left: 6px solid #e63946; text-align: left; }
     .tonalidad-tag { background: #e63946; color: white; padding: 3px 10px; border-radius: 4px; font-size: 0.8em; font-weight: bold; display: inline-block; margin-bottom: 10px; }
-    
-    /* REPRODUCTOR BLINDADO */
-    .video-wrapper {
-      position: relative;
-      width: 100%;
-      padding-top: 56.25%; 
-      background: #000;
-      border-radius: 12px;
-      overflow: hidden;
-    }
-
-    #player {
-      position: absolute;
-      top: -12%; left: -2%;
-      width: 104%; height: 124%;
-    }
-
-    .capa-blindada {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      z-index: 20;
-      background: rgba(0,0,0,0);
-      cursor: default;
-    }
-
-    /* PANEL DE BOTONES */
-    .controles {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      margin-top: 20px;
-      background: #222;
-      padding: 15px;
-      border-radius: 12px;
-    }
-
-    .btn-control {
-      background: #333; color: white; border: none; padding: 15px 5px;
-      border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s;
-      -webkit-tap-highlight-color: transparent;
-    }
-
+    .video-wrapper { position: relative; width: 100%; padding-top: 56.25%; background: #000; border-radius: 12px; overflow: hidden; }
+    #player { position: absolute; top: -12%; left: -2%; width: 104%; height: 124%; }
+    .capa-blindada { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 20; background: rgba(0,0,0,0); cursor: default; }
+    .controles { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 20px; background: #222; padding: 15px; border-radius: 12px; }
+    .btn-control { background: #333; color: white; border: none; padding: 15px 5px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; -webkit-tap-highlight-color: transparent; }
     .btn-control:active { background: #e63946; transform: scale(0.95); }
     .btn-play { background: #e63946; grid-column: span 2; font-size: 1.2rem; margin-bottom: 5px; }
     .btn-full { grid-column: span 2; background: #444; }
-
-    /* INTERFAZ DE EXPULSIÓN */
-    .expulsion-card { 
-      background: #1a1a1a; 
-      border: 2px solid #e63946; 
-      padding: 40px 20px; 
-      border-radius: 20px; 
-      margin-top: 50px;
-      box-shadow: 0 0 30px rgba(230, 57, 70, 0.4);
-    }
+    .expulsion-card { background: #1a1a1a; border: 2px solid #e63946; padding: 40px 20px; border-radius: 20px; margin-top: 50px; box-shadow: 0 0 30px rgba(230, 57, 70, 0.4); }
     .expulsion-card h3 { color: #e63946; font-size: 1.6rem; margin: 0 0 15px 0; }
-    .aviso-importante { 
-      background: rgba(230, 57, 70, 0.15); 
-      padding: 15px; border-radius: 10px; 
-      font-size: 0.95rem; color: #ffbaba;
-      margin: 20px 0; border-left: 4px solid #e63946;
-    }
-    #segundos-restantes { transition: all 0.2s ease; display: inline-block; }
+    .aviso-importante { background: rgba(230, 57, 70, 0.15); padding: 15px; border-radius: 10px; font-size: 0.95rem; color: #ffbaba; margin: 20px 0; border-left: 4px solid #e63946; }
+    #segundos-restantes { font-weight: bold; color: #e63946; font-size: 1.5rem; transition: all 0.2s ease; display: inline-block; }
   </style>
 </head>
 <body oncontextmenu="return false;">
@@ -97,12 +36,10 @@
 <div class="container">
   <div id="main-content">
     <div id="info-section"></div>
-
     <div class="video-wrapper">
       <div class="capa-blindada"></div>
       <div id="player"></div>
     </div>
-
     <div class="controles">
       <button class="btn-control btn-play" onclick="togglePlay()">⏯️ PLAY / PAUSA</button>
       <button class="btn-control" onclick="seek(-10)">⏪ -10 seg</button>
@@ -168,9 +105,11 @@
     await setDoc(sessionRef, { devices: [deviceId] }, { merge: false });
 
     onSnapshot(sessionRef, (snap) => {
+      // FILTRO: Ignorar si el cambio es nuestro (pendiente de subir)
+      if (snap.metadata.hasPendingWrites) return;
+
       if (snap.exists() && !snap.data().devices.includes(deviceId)) {
-        let cuentaRegresiva = 10;
-        
+        let seg = 10;
         document.getElementById("main-content").innerHTML = `
           <div class="expulsion-card">
             <h3>🚫 Sesión en uso</h3>
@@ -179,26 +118,21 @@
               ⚠️ <strong>Recuerda:</strong> Por seguridad, el acceso está permitido a <b>un solo dispositivo a la vez</b>.
             </div>
             <p style="margin-top:20px; font-size:1.1rem; color:#fff;">
-              Cerrando sesión en <span id="segundos-restantes" style="font-weight:bold; color:#e63946; font-size:1.5rem;">10</span> segundos...
+              Cerrando sesión en <span id="segundos-restantes">10</span> segundos...
             </p>
           </div>
         `;
         
-        const intervalo = setInterval(() => {
-          cuentaRegresiva--;
-          const spanSegundos = document.getElementById("segundos-restantes");
-          if (spanSegundos) spanSegundos.innerText = cuentaRegresiva;
-
-          if (cuentaRegresiva <= 0) {
-            clearInterval(intervalo);
-            ejecutarSalida();
+        const t = setInterval(async () => {
+          seg--;
+          const span = document.getElementById("segundos-restantes");
+          if (span) span.innerText = seg;
+          if (seg <= 0) { 
+            clearInterval(t); 
+            await signOut(auth); 
+            window.location.href = "index.html"; 
           }
         }, 1000);
-
-        async function ejecutarSalida() {
-          await signOut(auth); 
-          window.location.href = "index.html";
-        }
       }
     });
   });

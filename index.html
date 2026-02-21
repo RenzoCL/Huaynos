@@ -7,7 +7,7 @@
   <style>
     body { font-family: sans-serif; background: #111; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
     .login-box { background: #222; padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); text-align: center; width: 300px; }
-    input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 6px; border: none; box-sizing: border-box; font-size: 16px; }
+    input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 6px; border: none; box-sizing: border-box; font-size: 16px; background: #333; color: white; }
     button { width: 100%; padding: 12px; background: #e63946; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 10px; }
     button:active { transform: scale(0.98); }
   </style>
@@ -31,33 +31,24 @@
   const passInput = document.getElementById("password");
   const errorMsg = document.getElementById("error");
 
-  // FUNCIÓN ÚNICA DE REDIRECCIÓN
   function ejecutarRedireccion() {
     const destinoId = localStorage.getItem("proximoHuayno");
-    
-    if (destinoId && destinoId !== "null" && destinoId !== "undefined") {
-      // Si hay un ID guardado, lo borramos de la memoria y saltamos al video
+    if (destinoId && destinoId !== "null") {
       localStorage.removeItem("proximoHuayno");
       window.location.replace(`huayno.html?id=${destinoId}`);
     } else {
-      // Si no hay nada guardado, vamos al home normal
       window.location.replace("home.html");
     }
   }
 
-  // DETECTAR SI YA ESTÁ LOGUEADO
   onAuthStateChanged(auth, (user) => {
-    if (user) {
-      ejecutarRedireccion();
-    }
+    if (user) ejecutarRedireccion();
   });
 
-  // LOGUEARSE AL HACER CLIC
   btnLogin.onclick = async () => {
     errorMsg.innerText = "Validando...";
     try {
       await signInWithEmailAndPassword(auth, emailInput.value, passInput.value);
-      // No hace falta poner nada aquí, onAuthStateChanged se activará solo
     } catch (error) {
       errorMsg.innerText = "Correo o contraseña incorrectos";
     }
