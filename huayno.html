@@ -1,39 +1,109 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <title>Huayno</title>
 </head>
 <body>
 
-<h2 id="titulo"></h2>
+<h2 id="titulo">Cargando…</h2>
 <div id="player"></div>
+<p id="msg"></p>
 
 <script type="module">
-  import { auth } from "./firebase.js";
+  import { auth, db } from "./firebase.js";
   import { onAuthStateChanged } from
     "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  import { doc, getDoc, setDoc } from
+    "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+  // =========================
+  // CONFIGURACIÓN
+  // =========================
+  const MAX_DEVICES = 2;
+
+  // =========================
+  // DEVICE ID ÚNICO
+  // =========================
+  function getDeviceId() {
+    let id = localStorage.getItem("device_id");
+    if (!id) {
+      id = crypto.randomUUID();
+      localStorage.setItem("device_id", id);
+    }
+    return id;
+  }
+
+  // =========================
+  // LEER ID DEL HUAYNO (?id=huayno1)
+  // =========================
   const params = new URLSearchParams(window.location.search);
   const huaynoId = params.get("id");
 
-  onAuthStateChanged(auth, user => {
+  if (!huaynoId) {
+    document.getElementById("msg").innerText = "❌ Huayno no válido.";
+    throw new Error("Huayno sin ID");
+  }
+
+  // =========================
+  // AUTH + CONTROL DE DISPOSITIVOS
+  // =========================
+  onAuthStateChanged(auth, async (user) => {
     if (!user) {
+      // No logueado → volver al login
       window.location.href = "index.html";
       return;
     }
 
-    if (!huaynoId) {
-      document.body.innerHTML = "Huayno no válido";
-      return;
+    const deviceId = getDeviceId();
+    const ref = doc(db, "sessions", user.uid);
+    const snap = await getDoc(ref);
+
+    let devices = {};
+
+    if (snap.exists()) {
+      devices = snap.data().devices || {};
     }
 
-    document.getElementById("titulo").innerText = "Reproduciendo: " + huaynoId;
+    // Si el dispositivo NO está registrado
+    if (!devices[deviceId]) {
+      const count = Object.keys(devices).length;
 
+      if (count >= MAX_DEVICES) {
+        document.body.innerHTML = `
+          <h2>🚫 Acceso bloqueado</h2>
+          <p>Has alcanzado el límite de dispositivos permitidos.</p>
+          <p>Contacta al vendedor.</p>
+        `;
+        return;
+      }
+
+      // Registrar nuevo dispositivo
+      devices[deviceId] = {
+        lastSeen: Date.now()
+      };
+    } else {
+      // Actualizar actividad
+      devices[deviceId].lastSeen = Date.now();
+    }
+
+    // Guardar en Firestore
+    await setDoc(ref, { devices }, { merge: true });
+
+    // =========================
+    // ACCESO PERMITIDO
+    // =========================
+    document.getElementById("titulo").innerText =
+      "🎵 Reproduciendo: " + huaynoId;
+
+    // ⚠️ REEMPLAZA VIDEO_ID por el ID real de YouTube
     document.getElementById("player").innerHTML = `
-      <iframe width="300" height="200"
+      <iframe
+        width="300"
+        height="200"
         src="https://www.youtube.com/embed/VIDEO_ID"
-        allowfullscreen></iframe>
+        allowfullscreen>
+      </iframe>
     `;
   });
 </script>
