@@ -33,7 +33,7 @@ export const baseDeHuaynos = {
     "33": { titulo: "Linda Andahuaylina", artista: "Banda Show Sinfónica Sunicancha", tonalidad: "Mi menor", videoId: "1LCDzUq_FQM", inicio: 4 },
     "34": { titulo: "Linda Huaracina", artista: "Banda Show Filarmónica Llipa", tonalidad: "Mi menor", videoId: "61L6WUdSI34", inicio: 39 },
     "35": { titulo: "Mujer Carhuacina", artista: "Banda Show La Huaranchal", tonalidad: "Mi menor", videoId: "KH2mZ1yqwjY", inicio: 133 },
-    "36": { titulo: "Pájaro Pájaro Pájaro", artista: null, tonalidad: "Mi menor", videoId: "UyTd7c-rpEI", inicio: 47 }, // Artista no visible en imagen
+    "36": { titulo: "Pájaro Pájaro Pájaro", artista: "Banda Internacional Santa Cecilia de Cátac", tonalidad: "Mi menor", videoId: "UyTd7c-rpEI", inicio: 47 }, // Artista no visible en imagen
     "37": { titulo: "Perdóname", artista: "Banda Show La Huaranchal", tonalidad: "Mi menor", videoId: "LxQn8yEj0_g", inicio: 31 },
     "38": { titulo: "Por Que Me Dices Que Te Vas", artista: "Banda Filarmónica Star Sayan", tonalidad: "Mi menor", videoId: "3FkTXhdiCD0", inicio: 17 },
     "39": { titulo: "Puente de Marcará", artista: "Banda Show La Huaranchal", tonalidad: "Mi menor", videoId: "KH2mZ1yqwjY", inicio: 0 }, // Mismo video que Mujer Carhuacina
