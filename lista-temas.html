@@ -20,86 +20,88 @@
     </div>
 
     <script type="module">
-        import { auth, db } from "./firebase.js";
-        import { baseDeTemas } from "./js/temas.js";
-        import { vigilarSesion } from "./js/seguridad.js";
+    import { auth, db } from "./firebase.js";
+    import { baseDeTemas } from "./js/temas.js";
+    import { vigilarSesion } from "./js/seguridad.js";
 
-        // Vigilancia activa en la lista
-        vigilarSesion(auth, db, "lista-wrapper");
+    // 1. Vigilancia activa
+    vigilarSesion(auth, db, "lista-wrapper");
 
-        const params = new URLSearchParams(window.location.search);
-        const catActual = params.get('cat') || 'huayno';
-        document.getElementById("titulo-cat").innerText = catActual;
+    // 2. Parámetros de URL
+    const params = new URLSearchParams(window.location.search);
+    const catActual = params.get('cat') || 'huayno';
+    document.getElementById("titulo-cat").innerText = catActual;
 
-        const listaDiv = document.getElementById("lista");
-        const buscador = document.getElementById("buscador");
+    const listaDiv = document.getElementById("lista");
+    const buscador = document.getElementById("buscador");
 
-        function render(filtro = "") {
-            listaDiv.innerHTML = "";
+    // Función auxiliar para quitar tildes (hace que el buscador sea profesional)
+    const normalizarTexto = (texto) => {
+        return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    };
 
-            // 1. Definimos el orden de las notas musicales
-            const ordenNotas = { "do": 1, "re": 2, "mi": 3, "fa": 4, "sol": 5, "la": 6, "si": 7 };
+    function render(filtro = "") {
+        if (!listaDiv) return;
+        listaDiv.innerHTML = "";
 
-            // 2. Procesamos, filtramos y ordenamos la lista
-            const temasFiltrados = Object.keys(baseDeTemas)
-                .map(id => ({ id, ...baseDeTemas[id] }))
-                .filter(t => t.categoria === catActual)
-                .filter(t => 
-                    t.titulo.toLowerCase().includes(filtro.toLowerCase()) || 
-                    t.artista.toLowerCase().includes(filtro.toLowerCase())
-                )
-                .sort((a, b) => {
-                    const infoA = a.tonalidad.toLowerCase().split(" ");
-                    const infoB = b.tonalidad.toLowerCase().split(" ");
-                    
-                    const notaA = infoA[0];
-                    const modoA = infoA[1] || "mayor";
-                    
-                    const notaB = infoB[0];
-                    const modoB = infoB[1] || "mayor";
+        const ordenNotas = { "do": 1, "re": 2, "mi": 3, "fa": 4, "sol": 5, "la": 6, "si": 7 };
+        const textoBusqueda = normalizarTexto(filtro);
 
-                    // PRIORIDAD 1: Nota (Do, Re, Mi...)
-                    if (ordenNotas[notaA] !== ordenNotas[notaB]) {
-                        return (ordenNotas[notaA] || 99) - (ordenNotas[notaB] || 99);
-                    }
+        const temasFiltrados = Object.keys(baseDeTemas)
+            .map(id => ({ id, ...baseDeTemas[id] }))
+            .filter(t => t.categoria === catActual)
+            .filter(t => {
+                const titulo = normalizarTexto(t.titulo);
+                const artista = normalizarTexto(t.artista);
+                return titulo.includes(textoBusqueda) || artista.includes(textoBusqueda);
+            })
+            .sort((a, b) => {
+                const infoA = a.tonalidad.toLowerCase().split(" ");
+                const infoB = b.tonalidad.toLowerCase().split(" ");
+                const notaA = infoA[0];
+                const modoA = infoA[1] || "mayor";
+                const notaB = infoB[0];
+                const modoB = infoB[1] || "mayor";
 
-                    // PRIORIDAD 2: Modo (Mayor antes que Menor)
-                    if (modoA !== modoB) {
-                        return modoA === "mayor" ? -1 : 1; 
-                    }
-
-                    // PRIORIDAD 3: Alfabeto
-                    return a.titulo.localeCompare(b.titulo);
-                });
-
-            // 3. Verificamos si hay resultados
-            if (temasFiltrados.length === 0) {
-                listaDiv.innerHTML = "<p style='color:#666; text-align:center; padding:20px;'>No se encontraron temas.</p>";
-                return;
-            }
-
-            // 4. Dibujamos las tarjetas
-            temasFiltrados.forEach(t => {
-                const card = document.createElement("a");
-                card.href = `reproductor.html?id=${t.id}`;
-                
-                // Limpieza de tonalidad para CSS
-                const claseColor = t.tonalidad.toLowerCase().trim().replace(/\s+/g, '-');
-                card.className = `card ${claseColor}`;
-                
-                card.innerHTML = `
-                    <div style="display:flex; flex-direction:column;">
-                        <span class="titulo">${t.titulo}</span>
-                        <span style="font-size:0.7rem; color:#888;">${t.artista}</span>
-                    </div>
-                    <span class="tono-tag">${t.tonalidad}</span>
-                `;
-                listaDiv.appendChild(card);
+                if (ordenNotas[notaA] !== ordenNotas[notaB]) {
+                    return (ordenNotas[notaA] || 99) - (ordenNotas[notaB] || 99);
+                }
+                if (modoA !== modoB) {
+                    return modoA === "mayor" ? -1 : 1; 
+                }
+                return a.titulo.localeCompare(b.titulo);
             });
+
+        if (temasFiltrados.length === 0) {
+            listaDiv.innerHTML = `<p style="grid-column: 1/-1; text-align:center; color:#666; padding:50px;">
+                No se encontraron temas que coincidan con "${filtro}"</p>`;
+            return;
         }
 
-        buscador.oninput = (e) => render(e.target.value);
-        render();
-    </script>
+        temasFiltrados.forEach(t => {
+            const card = document.createElement("a");
+            card.href = `reproductor.html?id=${t.id}`;
+            const claseColor = t.tonalidad.toLowerCase().trim().replace(/\s+/g, '-');
+            card.className = `card ${claseColor}`;
+            card.innerHTML = `
+                <div style="display:flex; flex-direction:column;">
+                    <span class="titulo">${t.titulo}</span>
+                    <span style="font-size:0.7rem; color:#888;">${t.artista}</span>
+                </div>
+                <span class="tono-tag">${t.tonalidad}</span>
+            `;
+            listaDiv.appendChild(card);
+        });
+    }
+
+    // 3. Escuchar el evento de escritura
+    // Usamos 'input' para que sea instantáneo mientras escribes
+    buscador.addEventListener("input", (e) => {
+        render(e.target.value);
+    });
+
+    // 4. Carga inicial
+    render();
+</script>
 </body>
 </html>
