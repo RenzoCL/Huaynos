@@ -44,25 +44,18 @@
     }
     .titulo-song { font-size: 1.3rem; margin: 5px 0; font-weight: bold; }
     
-    /* CONTENEDOR CON ESCUDO INVISIBLE */
+    /* CONTENEDOR CON PARCHES DE SEGURIDAD */
     #player-container { 
       background: #000; border-radius: 12px; overflow: hidden; 
       box-shadow: 0 10px 30px rgba(0,0,0,0.5); aspect-ratio: 16 / 9;
       display: flex; align-items: center; justify-content: center;
-      position: relative; /* Necesario para la capa invisible */
+      position: relative; 
     }
 
-    /* La capa transparente que bloquea clics en el logo de YT */
-    .capa-invisible {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 10;
-      background: rgba(0,0,0,0); /* Totalmente transparente */
-      cursor: default;
-    }
+    /* CAPAS INVISIBLES (Bloquean bordes, dejan centro libre) */
+    .escudo-superior { position: absolute; top: 0; left: 0; width: 100%; height: 55px; z-index: 10; background: transparent; }
+    .escudo-inferior { position: absolute; bottom: 0; left: 0; width: 100%; height: 45px; z-index: 10; background: transparent; }
+    .escudo-derecho { position: absolute; top: 0; right: 0; width: 75px; height: 100%; z-index: 10; background: transparent; }
 
     iframe { width: 100%; height: 100%; border: none; z-index: 1; }
 
@@ -70,7 +63,9 @@
     .expulsion-card { background: #3a1a1a; border: 2px solid #e63946; padding: 30px; border-radius: 15px; }
   </style>
 </head>
-<body oncontextmenu="return false;"> <nav>
+<body oncontextmenu="return false;">
+
+<nav>
   <a href="home.html" class="btn-nav btn-inicio">🏠 Inicio</a>
   <button onclick="globalLogout()" class="btn-nav btn-logout">Cerrar Sesión</button>
 </nav>
@@ -93,7 +88,7 @@
 
   const baseDeHuaynos = {
     "1": { titulo: "Ayer la vi a mi ex", tonalidad: "La menor", videoId: "FTV-9T8b05I", inicio: 29 },
-    "2": { titulo: "Brindaré Por Ti", tonalidad: "La menor", videoId: "JfLWXhriLik", inicio: 577 },
+    "2": { titulo: "Brindaré Por Ti", tonalidad: "La menor", videoId: "", inicio: 0 },
     "3": { titulo: "Cajamarquina", tonalidad: "La menor", videoId: "", inicio: 0 },
     "4": { titulo: "Cancer de Amor", tonalidad: "La menor", videoId: "", inicio: 0 },
     "5": { titulo: "Chico Mentiroso", tonalidad: "La menor", videoId: "", inicio: 0 },
@@ -166,7 +161,7 @@
     "72": { titulo: "Madre", tonalidad: "Sol menor", videoId: "", inicio: 0 },
     "73": { titulo: "Mary se Llama", tonalidad: "Sol menor", videoId: "", inicio: 0 },
     "74": { titulo: "Me Emborracho Por Tu Amor", tonalidad: "Sol menor", videoId: "", inicio: 0 },
-    "75": { titulo: "Mix Flor Pileña", tonalidad: "Sol menor", videoId: "", inicio: 0 },
+    "75": { titulo: "Mix Flor Piña", tonalidad: "Sol menor", videoId: "", inicio: 0 },
     "76": { titulo: "No Puedo Amarte", tonalidad: "Sol menor", videoId: "", inicio: 0 },
     "77": { titulo: "Otra Vez Me Enamoré", tonalidad: "Sol menor", videoId: "", inicio: 0 },
     "78": { titulo: "Que Linda Flor", tonalidad: "Sol menor", videoId: "", inicio: 0 },
@@ -204,8 +199,13 @@
         <small style="color: #888;">Nro. #${id}</small>
       </div>
       <div id="player-container">
-        <div class="capa-invisible"></div>
-        ${d.videoId ? `<iframe src="https://www.youtube.com/embed/${d.videoId}?start=${d.inicio}&rel=0&modestbranding=1&controls=1&disablekb=1&iv_load_policy=3" allowfullscreen></iframe>` : "<p>Video no vinculado aún 🎺</p>"}
+        <div class="escudo-superior"></div>
+        <div class="escudo-inferior"></div>
+        <div class="escudo-derecho"></div>
+
+        ${d.videoId ? 
+          `<iframe src="https://www.youtube.com/embed/${d.videoId}?start=${d.inicio}&rel=0&modestbranding=1&controls=1&disablekb=1&iv_load_policy=3" allowfullscreen></iframe>` 
+          : "<p>Video no vinculado aún 🎺</p>"}
       </div>
     `;
   }
@@ -215,6 +215,11 @@
     await signOut(auth);
     window.location.href = "index.html";
   };
+
+  // Bloqueo de inspección adicional
+  document.addEventListener('keydown', event => {
+    if (event.ctrlKey && (event.key === 'u' || event.key === 's')) event.preventDefault();
+  });
 </script>
 </body>
 </html>
