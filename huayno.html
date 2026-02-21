@@ -2,122 +2,108 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Huayno</title>
+  <title>Huaynos 🎺</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: white;
+      padding: 20px;
+    }
+    button {
+      padding: 10px;
+      background: #e63946;
+      color: white;
+      border: none;
+      cursor: pointer;
+      margin-bottom: 20px;
+    }
+    .blocked {
+      color: #ff6b6b;
+      font-size: 18px;
+    }
+  </style>
 </head>
 <body>
 
-<h2 id="titulo">Cargando…</h2>
-<div id="player"></div>
-<p id="msg"></p>
+<h1>Huaynos para Trompeta 🎺</h1>
+<button id="logoutBtn">Cerrar sesión</button>
 
-<button id="logoutBtn" style="display:none;">Cerrar sesión</button>
+<div id="content">Cargando...</div>
 
 <script type="module">
   import { auth, db } from "./firebase.js";
-  import { onAuthStateChanged, signOut } from
-    "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-  import { doc, getDoc, setDoc } from
-    "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { onAuthStateChanged, signOut } 
+    from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  import { doc, getDoc, setDoc, updateDoc, deleteField } 
+    from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
   const MAX_DEVICES = 1;
+  const content = document.getElementById("content");
+  const logoutBtn = document.getElementById("logoutBtn");
 
-  // =========================
-  // DEVICE ID ÚNICO
-  // =========================
-  function getDeviceId() {
-    let id = localStorage.getItem("device_id");
-    if (!id) {
-      id = crypto.randomUUID();
-      localStorage.setItem("device_id", id);
-    }
-    return id;
-  }
+  const deviceId = crypto.randomUUID();
 
-  const deviceId = getDeviceId();
-
-  // =========================
-  // LEER HUAYNO
-  // =========================
-  const params = new URLSearchParams(window.location.search);
-  const huaynoId = params.get("id");
-
-  if (!huaynoId) {
-    document.getElementById("msg").innerText = "❌ Huayno no válido.";
-    throw new Error("Huayno sin ID");
-  }
-
-  // =========================
-  // AUTH + CONTROL
-  // =========================
   onAuthStateChanged(auth, async (user) => {
     if (!user) {
       window.location.href = "index.html";
       return;
     }
 
-    try {
-      const ref = doc(db, "sessions", user.uid);
-      const snap = await getDoc(ref);
+    const ref = doc(db, "sessions", user.uid);
+    const snap = await getDoc(ref);
 
-      let devices = {};
+    let devices = [];
 
-      if (snap.exists()) {
-        devices = snap.data().devices || {};
-      }
-
-      // 🚫 LÍMITE ALCANZADO
-      if (!devices[deviceId] && Object.keys(devices).length >= MAX_DEVICES) {
-        document.body.innerHTML = `
-          <h2>🚫 Acceso bloqueado</h2>
-          <p>Has alcanzado el límite de dispositivos permitidos.</p>
-          <p>Cierra sesión en otro dispositivo.</p>
-        `;
-        return;
-      }
-
-      // Registrar o actualizar dispositivo
-      devices[deviceId] = { lastSeen: Date.now() };
-
-      await setDoc(ref, { devices }, { merge: true });
-
-      // =========================
-      // ACCESO OK
-      // =========================
-      document.getElementById("titulo").innerText =
-        "🎵 Reproduciendo: " + huaynoId;
-
-      document.getElementById("player").innerHTML = `
-        <iframe width="300" height="200"
-          src="https://www.youtube.com/embed/VIDEO_ID"
-          allowfullscreen></iframe>
-      `;
-
-      document.getElementById("logoutBtn").style.display = "block";
-
-      // =========================
-      // CERRAR SESIÓN
-      // =========================
-      document.getElementById("logoutBtn").onclick = async () => {
-        const snap2 = await getDoc(ref);
-        let devices2 = snap2.data().devices || {};
-
-        // ❌ eliminar ESTE dispositivo
-        delete devices2[deviceId];
-
-        await setDoc(ref, { devices: devices2 }, { merge: true });
-
-        await signOut(auth);
-        localStorage.removeItem("device_id");
-
-        window.location.href = "index.html";
-      };
-
-    } catch (e) {
-      document.getElementById("msg").innerText =
-        "❌ Error de conexión. Intenta nuevamente.";
-      console.error(e);
+    if (snap.exists()) {
+      devices = snap.data().devices || [];
     }
+
+    // Ya conectado en este dispositivo
+    if (devices.includes(deviceId)) {
+      showContent();
+      return;
+    }
+
+    // Excede límite
+    if (devices.length >= MAX_DEVICES) {
+      content.innerHTML = `<p class="blocked">
+        Acceso bloqueado.<br>
+        Ya hay una sesión activa en otro dispositivo.
+      </p>`;
+      return;
+    }
+
+    // Registrar dispositivo
+    devices.push(deviceId);
+    await setDoc(ref, { devices }, { merge: true });
+
+    showContent();
   });
+
+  function showContent() {
+    content.innerHTML = `
+      <p>✅ Acceso permitido</p>
+      <p>Aquí irá el reproductor del huayno 🎶</p>
+    `;
+  }
+
+  logoutBtn.onclick = async () => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const ref = doc(db, "sessions", user.uid);
+    const snap = await getDoc(ref);
+
+    if (snap.exists()) {
+      let devices = snap.data().devices || [];
+      devices = devices.filter(d => d !== deviceId);
+      await updateDoc(ref, { devices });
+    }
+
+    await signOut(auth);
+    window.location.href = "index.html";
+  };
 </script>
 
 </body>
