@@ -75,5 +75,7 @@ export const baseDeTemas = {
     "78": { titulo: "Que Linda Flor",               artista: null,                                          tonalidad: "Sol menor", videoId: null, inicio: 0, categoria: "huayno" },
     "79": { titulo: "Viaje de Amor",                artista: "Banda Orquesta Corazón de Huandoval",         tonalidad: "Sol menor", videoId: "MPIBKts3HCE", inicio: 20, categoria: "huayno" },
     "80": { titulo: "Vizcachita",                   artista: null,                                          tonalidad: "Sol menor", videoId: null, inicio: 0, categoria: "huayno" },
-    "81": { titulo: "Ya Se Marchó",                 artista: "Banda Show La Huaranchal",                    tonalidad: "Sol menor", videoId: "5aM1V9y_alk", inicio: 252, categoria: "huayno" }
+    "81": { titulo: "Ya Se Marchó",                 artista: "Banda Show La Huaranchal",                    tonalidad: "Sol menor", videoId: "5aM1V9y_alk", inicio: 252, categoria: "huayno" },
+    "82": { titulo: "Locura de Amor",               artista: "Banda Show La Huaranchal",                    tonalidad: "Sol menor", videoId: "Yrp6WTyaQqA", inicio: 26, categoria: "huayno" },
+    "83": { titulo: "Trátame con Cariño",           artista: "Banda Show La Huaranchal",                    tonalidad: "Sol menor", videoId: "gJ7axr_iHqM", inicio: 27, categoria: "huayno" }
 };
