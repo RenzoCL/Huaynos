@@ -1,4 +1,3 @@
-// seguridad.js
 import { signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 export function manejarExpulsion(contenedor, auth) {
@@ -15,11 +14,12 @@ export function manejarExpulsion(contenedor, auth) {
             </p>
         </div>
     `;
-    
+
     const t = setInterval(async () => {
         seg--;
         const span = document.getElementById("segundos-restantes");
         if (span) span.innerText = seg;
+        
         if (seg <= 0) {
             clearInterval(t);
             await signOut(auth);
@@ -29,6 +29,10 @@ export function manejarExpulsion(contenedor, auth) {
 }
 
 export async function globalLogout(auth) {
-    await signOut(auth);
-    window.location.href = "index.html";
+    try {
+        await signOut(auth);
+        window.location.href = "index.html";
+    } catch (e) {
+        console.error("Error al salir:", e);
+    }
 }

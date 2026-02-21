@@ -3,69 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Academia de Trompeta - Inicio</title>
+    <title>Inicio - Academia</title>
     <link rel="stylesheet" href="css/estilo.css">
-    <style>
-        .grid-categorias {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 20px;
-            padding: 20px;
-        }
-        .cat-card {
-            background: #222;
-            border-radius: 12px;
-            overflow: hidden;
-            text-decoration: none;
-            color: white;
-            transition: transform 0.3s, border-color 0.3s;
-            border: 2px solid #333;
-            display: flex;
-            flex-direction: column;
-        }
-        .cat-card:hover {
-            transform: translateY(-5px);
-            border-color: #e63946;
-        }
-        .cat-card img {
-            width: 100%;
-            height: 110px;
-            object-fit: cover;
-        }
-        .cat-card span {
-            padding: 12px;
-            text-align: center;
-            font-weight: bold;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        h2 { padding: 20px 20px 0; font-size: 1.5rem; color: #eee; }
-    </style>
 </head>
 <body>
     <nav>
-        <span style="font-weight: bold; color: #e63946;">🎺 ACADEMIA PREMIUM</span>
+        <span>🎺 ACADEMIA</span>
         <button id="btnLogOut" class="btn-nav btn-logout">Cerrar Sesión</button>
     </nav>
 
     <h2>Mis Categorías</h2>
-    
     <div class="grid-categorias">
         <a href="lista-temas.html?cat=huayno" class="cat-card">
-            <img src="imagenes/huayno.jpg" alt="Huayno"><span>Huaynos</span>
+            <img src="imagenes/huayno.jpg"><span>Huaynos</span>
         </a>
         <a href="lista-temas.html?cat=salay" class="cat-card">
-            <img src="imagenes/salay.jpg" alt="Salay"><span>Salay</span>
-        </a>
-        <a href="lista-temas.html?cat=bolo" class="cat-card">
-            <img src="imagenes/bolo.jpg" alt="Bolo"><span>Bolo</span>
-        </a>
-        <a href="lista-temas.html?cat=cumbia" class="cat-card">
-            <img src="imagenes/cumbia.jpg" alt="Cumbia"><span>Cumbias</span>
+            <img src="imagenes/salay.jpg"><span>Salay</span>
         </a>
         <a href="lista-temas.html?cat=metodos" class="cat-card">
-            <img src="imagenes/metodos.jpg" alt="Metodos"><span>Métodos Trompeta</span>
+            <img src="imagenes/metodos.jpg"><span>Métodos</span>
         </a>
         </div>
 
