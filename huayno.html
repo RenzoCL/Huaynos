@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Huaynos 🎺</title>
+  <title>Huaynos para Trompeta 🎺</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -10,17 +10,25 @@
       color: white;
       padding: 20px;
     }
+    h1 {
+      margin-bottom: 10px;
+    }
     button {
-      padding: 10px;
+      padding: 10px 15px;
       background: #e63946;
       color: white;
       border: none;
       cursor: pointer;
-      margin-bottom: 20px;
+      border-radius: 5px;
     }
     .blocked {
       color: #ff6b6b;
       font-size: 18px;
+      margin-top: 20px;
+    }
+    .ok {
+      color: #4caf50;
+      margin-top: 20px;
     }
   </style>
 </head>
@@ -35,80 +43,104 @@
   import { auth, db } from "./firebase.js";
   import { onAuthStateChanged, signOut } 
     from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-  import { doc, getDoc, setDoc, updateDoc, deleteField } 
+  import { doc, getDoc, setDoc, updateDoc } 
     from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+  // 🔒 CONFIGURACIÓN
   const MAX_DEVICES = 1;
+
   const content = document.getElementById("content");
   const logoutBtn = document.getElementById("logoutBtn");
 
+  // 🧠 DEVICE ID PERSISTENTE
   let deviceId = localStorage.getItem("deviceId");
-
   if (!deviceId) {
     deviceId = crypto.randomUUID();
     localStorage.setItem("deviceId", deviceId);
   }
 
+  // 🔐 CONTROL DE SESIÓN
   onAuthStateChanged(auth, async (user) => {
     if (!user) {
       window.location.href = "index.html";
       return;
     }
 
-    const ref = doc(db, "sessions", user.uid);
-    const snap = await getDoc(ref);
+    try {
+      const ref = doc(db, "sessions", user.uid);
+      const snap = await getDoc(ref);
 
-    let devices = [];
+      let devices = [];
 
-    if (snap.exists()) {
-      devices = snap.data().devices || [];
+      if (snap.exists()) {
+        devices = snap.data().devices || [];
+      }
+
+      // Ya registrado este dispositivo
+      if (devices.includes(deviceId)) {
+        mostrarContenido();
+        return;
+      }
+
+      // Excede el límite
+      if (devices.length >= MAX_DEVICES) {
+        content.innerHTML = `
+          <p class="blocked">
+            🚫 Acceso bloqueado<br>
+            Ya hay una sesión activa en otro dispositivo.
+          </p>
+        `;
+        return;
+      }
+
+      // Registrar dispositivo
+      devices.push(deviceId);
+      await setDoc(ref, { devices }, { merge: true });
+
+      mostrarContenido();
+
+    } catch (error) {
+      console.error(error);
+      content.innerHTML = `
+        <p class="blocked">
+          Error al verificar la sesión.<br>
+          Intenta nuevamente.
+        </p>
+      `;
     }
-
-    // Ya conectado en este dispositivo
-    if (devices.includes(deviceId)) {
-      showContent();
-      return;
-    }
-
-    // Excede límite
-    if (devices.length >= MAX_DEVICES) {
-      content.innerHTML = `<p class="blocked">
-        Acceso bloqueado.<br>
-        Ya hay una sesión activa en otro dispositivo.
-      </p>`;
-      return;
-    }
-
-    // Registrar dispositivo
-    devices.push(deviceId);
-    await setDoc(ref, { devices }, { merge: true });
-
-    showContent();
   });
 
-  function showContent() {
+  // 🎶 CONTENIDO PROTEGIDO
+  function mostrarContenido() {
     content.innerHTML = `
-      <p>✅ Acceso permitido</p>
+      <p class="ok">✅ Acceso permitido</p>
       <p>Aquí irá el reproductor del huayno 🎶</p>
     `;
   }
 
-  logoutBtn.onclick = async () => {
+  // 🚪 CERRAR SESIÓN
+  logoutBtn.addEventListener("click", async () => {
     const user = auth.currentUser;
     if (!user) return;
 
-    const ref = doc(db, "sessions", user.uid);
-    const snap = await getDoc(ref);
+    try {
+      const ref = doc(db, "sessions", user.uid);
+      const snap = await getDoc(ref);
 
-    if (snap.exists()) {
-      let devices = snap.data().devices || [];
-      devices = devices.filter(d => d !== deviceId);
-      await updateDoc(ref, { devices });
+      if (snap.exists()) {
+        let devices = snap.data().devices || [];
+        devices = devices.filter(d => d !== deviceId);
+        await updateDoc(ref, { devices });
+      }
+
+      await signOut(auth);
+      window.location.href = "index.html";
+
+    } catch (error) {
+      console.error(error);
+      alert("Error al cerrar sesión");
     }
-
-    await signOut(auth);
-    window.location.href = "index.html";
-  };
+  });
 </script>
 
 </body>
