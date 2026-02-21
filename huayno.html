@@ -32,14 +32,12 @@
       overflow: hidden;
     }
 
-    /* Recorte estratégico para esconder logos y títulos */
     #player {
       position: absolute;
       top: -12%; left: -2%;
       width: 104%; height: 124%;
     }
 
-    /* CAPA INVISIBLE QUE BLOQUEA TODO EL VIDEO */
     .capa-blindada {
       position: absolute;
       top: 0; left: 0;
@@ -70,7 +68,7 @@
     .btn-play { background: #e63946; grid-column: span 2; font-size: 1.2rem; margin-bottom: 5px; }
     .btn-full { grid-column: span 2; background: #444; }
 
-    /* INTERFAZ DE EXPULSIÓN MEJORADA */
+    /* INTERFAZ DE EXPULSIÓN */
     .expulsion-card { 
       background: #1a1a1a; 
       border: 2px solid #e63946; 
@@ -80,16 +78,13 @@
       box-shadow: 0 0 30px rgba(230, 57, 70, 0.4);
     }
     .expulsion-card h3 { color: #e63946; font-size: 1.6rem; margin: 0 0 15px 0; }
-    .expulsion-card p { color: #ccc; line-height: 1.6; font-size: 1rem; }
     .aviso-importante { 
       background: rgba(230, 57, 70, 0.15); 
-      padding: 15px; 
-      border-radius: 10px; 
-      font-size: 0.95rem; 
-      color: #ffbaba;
-      margin: 20px 0;
-      border-left: 4px solid #e63946;
+      padding: 15px; border-radius: 10px; 
+      font-size: 0.95rem; color: #ffbaba;
+      margin: 20px 0; border-left: 4px solid #e63946;
     }
+    #segundos-restantes { transition: all 0.2s ease; display: inline-block; }
   </style>
 </head>
 <body oncontextmenu="return false;">
@@ -114,7 +109,7 @@
       <button class="btn-control" onclick="seek(10)">10 seg ⏩</button>
       <button class="btn-control" onclick="seek(-5)">⏪ -5 seg</button>
       <button class="btn-control" onclick="seek(5)">5 seg ⏩</button>
-      <button class="btn-control btn-full" onclick="irAlInicio()">🔄 REINICIAR (Desde el inicio fijado)</button>
+      <button class="btn-control btn-full" onclick="irAlInicio()">🔄 REINICIAR</button>
     </div>
   </div>
 </div>
@@ -172,7 +167,8 @@
 
     onSnapshot(sessionRef, (snap) => {
       if (snap.exists() && !snap.data().devices.includes(deviceId)) {
-        // MOSTRAR INTERFAZ DE EXPULSIÓN MEJORADA
+        let cuentaRegresiva = 10;
+        
         document.getElementById("main-content").innerHTML = `
           <div class="expulsion-card">
             <h3>🚫 Sesión en uso</h3>
@@ -180,15 +176,27 @@
             <div class="aviso-importante">
               ⚠️ <strong>Recuerda:</strong> Por seguridad, el acceso está permitido a <b>un solo dispositivo a la vez</b>.
             </div>
-            <p style="margin-top:20px; font-size:0.9rem; color:#888;">Redirigiendo al inicio en 10 segundos...</p>
+            <p style="margin-top:20px; font-size:1.1rem; color:#fff;">
+              Cerrando sesión en <span id="segundos-restantes" style="font-weight:bold; color:#e63946; font-size:1.5rem;">10</span> segundos...
+            </p>
           </div>
         `;
         
-        // TEMPORIZADOR DE 10 SEGUNDOS
-        setTimeout(async () => { 
+        const intervalo = setInterval(() => {
+          cuentaRegresiva--;
+          const spanSegundos = document.getElementById("segundos-restantes");
+          if (spanSegundos) spanSegundos.innerText = cuentaRegresiva;
+
+          if (cuentaRegresiva <= 0) {
+            clearInterval(intervalo);
+            ejecutarSalida();
+          }
+        }, 1000);
+
+        async function ejecutarSalida() {
           await signOut(auth); 
-          window.location.href = "index.html"; 
-        }, 10000);
+          window.location.href = "index.html";
+        }
       }
     });
   });
@@ -202,15 +210,7 @@
     window.onYouTubeIframeAPIReady = function() {
       window.player = new YT.Player('player', {
         videoId: huayno.videoId,
-        playerVars: {
-          'start': huayno.inicio,
-          'controls': 0,
-          'modestbranding': 1,
-          'rel': 0,
-          'iv_load_policy': 3,
-          'disablekb': 1,
-          'playsinline': 1
-        }
+        playerVars: { 'start': huayno.inicio, 'controls': 0, 'modestbranding': 1, 'rel': 0, 'iv_load_policy': 3, 'disablekb': 1, 'playsinline': 1 }
       });
     };
   } else {
