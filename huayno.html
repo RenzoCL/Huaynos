@@ -72,7 +72,6 @@
       margin-bottom: 5px;
     }
 
-    /* Estilo para la Alerta de Expulsión */
     .expulsion-card {
       background: #3a1a1a; 
       border: 2px solid #e63946; 
@@ -101,9 +100,7 @@
 
 <div class="container">
   <h1>Huaynos para Trompeta 🎺</h1>
-  
   <div id="content">Verificando acceso...</div>
-
   <button class="secondary-btn" id="logoutBtn">Cerrar sesión / Salir</button>
 </div>
 
@@ -117,37 +114,21 @@
   const content = document.getElementById("content");
   const logoutBtn = document.getElementById("logoutBtn");
 
-  // 🆔 ID ÚNICO DEL DISPOSITIVO
   let deviceId = localStorage.getItem("deviceId");
   if (!deviceId) {
     deviceId = crypto.randomUUID();
     localStorage.setItem("deviceId", deviceId);
   }
 
-  // 📖 DICCIONARIO DE HUAYNOS (Agregue aquí sus 84+ temas)
+  // VARIABLE DE CONTROL PARA EVITAR EL BUCLE DE EXPULSIÓN
+  let expulsando = false;
+
   const baseDeHuaynos = {
-    "1": { 
-      titulo: "Ayer la vi a mi ex", 
-      tonalidad: "La Menor", 
-      videoId: "FTV-9T8b05I", 
-      inicio: 29 
-    },
-    "2": { 
-      titulo: "Valicha", 
-      tonalidad: "Re Menor", 
-      videoId: "hW96xU1Ykps", 
-      inicio: 0 
-    },
-    "3": { 
-      titulo: "Adiós Pueblo de Ayacucho", 
-      tonalidad: "Mi Menor", 
-      videoId: "h-fH_0f5e7c", 
-      inicio: 0 
-    }
-    // Para agregar más: "4": { titulo: "...", tonalidad: "...", videoId: "...", inicio: 0 },
+    "1": { titulo: "Ayer la vi a mi ex", tonalidad: "La Menor", videoId: "FTV-9T8b05I", inicio: 29 },
+    "2": { titulo: "Valicha", tonalidad: "Re Menor", videoId: "hW96xU1Ykps", inicio: 0 },
+    "3": { titulo: "Adiós Pueblo de Ayacucho", tonalidad: "Mi Menor", videoId: "h-fH_0f5e7c", inicio: 0 }
   };
 
-  // 🛡️ CONTROL DE ACCESO
   onAuthStateChanged(auth, async (user) => {
     if (!user) {
       window.location.href = "index.html";
@@ -157,7 +138,11 @@
     const sessionRef = doc(db, "sessions", user.uid);
     await registrarEsteDispositivo(sessionRef);
 
+    // ESCUCHAR CAMBIOS
     onSnapshot(sessionRef, (snap) => {
+      // Si ya estamos en proceso de expulsión, ignoramos cualquier otro cambio
+      if (expulsando) return;
+
       if (snap.exists()) {
         const activeDevices = snap.data().devices || [];
         if (activeDevices.includes(deviceId)) {
@@ -175,8 +160,9 @@
     } catch (e) { console.error(e); }
   }
 
-  // 🚪 FUNCIÓN DE EXPULSIÓN PROFESIONAL
   async function ejecutarExpulsion() {
+    expulsando = true; // ACTIVAMOS LA PALANCA PARA DETENER EL SNAPSHOT
+
     content.innerHTML = `
       <div class="expulsion-card">
         <p style="font-size: 3rem; margin: 0;">🚫</p>
@@ -195,7 +181,7 @@
     `;
     
     try {
-      await signOut(auth); // Borra sesión para evitar bucles automáticos
+      await signOut(auth); // Cerramos sesión de inmediato
       
       let segundos = 5;
       const timer = setInterval(() => {
