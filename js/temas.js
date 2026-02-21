@@ -78,5 +78,7 @@ export const baseDeTemas = {
     "81": { titulo: "Ya Se Marchó",                 artista: "Banda Show La Huaranchal",                    tonalidad: "Sol menor", videoId: "5aM1V9y_alk", inicio: 252, categoria: "huayno" },
     "82": { titulo: "Locura de Amor",               artista: "Banda Show La Huaranchal",                    tonalidad: "Re menor", videoId: "Yrp6WTyaQqA", inicio: 26, categoria: "huayno" },
     "83": { titulo: "Trátame con Cariño",           artista: "Banda Show La Huaranchal",                    tonalidad: "Re menor", videoId: "gJ7axr_iHqM", inicio: 27, categoria: "huayno" },
-    "84": { titulo: "Casualidad",                   artista: "Banda Show Sinfónica Yanas",                  tonalidad: "Re menor", videoId: "FTE3NtrhvIU", inicio: 157, categoria: "huayno" }
+    "84": { titulo: "Casualidad",                   artista: "Banda Show Sinfónica Yanas",                  tonalidad: "Re menor", videoId: "FTE3NtrhvIU", inicio: 157, categoria: "huayno" },
+    "85": { titulo: "Mi Flaca Preferida",           artista: "Banda Orquesta Social Huancaya (BOSH)",       tonalidad: "Sol menor", videoId: "cOvPTEwqXg0", inicio: 0, categoria: "huayno" },
+    "86": { titulo: "Cerveza Cerveza",              artista: "Banda Show Orquesta San Agustín de Huandoval",tonalidad: "Sol menor", videoId: "FTE3NtrhvIU", inicio: 28, categoria: "huayno" }
 };
