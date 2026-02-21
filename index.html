@@ -9,7 +9,6 @@
     .login-box { background: #222; padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); text-align: center; width: 300px; }
     input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 6px; border: none; box-sizing: border-box; font-size: 16px; background: #333; color: white; }
     button { width: 100%; padding: 12px; background: #e63946; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 10px; }
-    button:active { transform: scale(0.98); }
   </style>
 </head>
 <body>
@@ -19,39 +18,31 @@
   <input type="email" id="email" placeholder="Correo electrónico">
   <input type="password" id="password" placeholder="Contraseña">
   <button id="btnLogin">Entrar</button>
-  <p id="error" style="color: #ff4d4d; font-size: 0.8rem; min-height: 1.2em; margin-top: 10px;"></p>
+  <p id="error" style="color: #ff4d4d; font-size: 0.8rem; margin-top: 10px;"></p>
 </div>
 
 <script type="module">
   import { auth } from "./firebase.js";
   import { signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-  const btnLogin = document.getElementById("btnLogin");
-  const emailInput = document.getElementById("email");
-  const passInput = document.getElementById("password");
-  const errorMsg = document.getElementById("error");
-
-  function ejecutarRedireccion() {
-    const destinoId = localStorage.getItem("proximoHuayno");
-    if (destinoId && destinoId !== "null") {
-      localStorage.removeItem("proximoHuayno");
-      window.location.replace(`huayno.html?id=${destinoId}`);
-    } else {
-      window.location.replace("home.html");
-    }
-  }
-
   onAuthStateChanged(auth, (user) => {
-    if (user) ejecutarRedireccion();
+    if (user) {
+      const destinoId = localStorage.getItem("proximoHuayno");
+      if (destinoId) {
+        localStorage.removeItem("proximoHuayno");
+        window.location.replace(`huayno.html?id=${destinoId}`);
+      } else {
+        window.location.replace("home.html");
+      }
+    }
   });
 
-  btnLogin.onclick = async () => {
+  document.getElementById("btnLogin").onclick = async () => {
+    const errorMsg = document.getElementById("error");
     errorMsg.innerText = "Validando...";
     try {
-      await signInWithEmailAndPassword(auth, emailInput.value, passInput.value);
-    } catch (error) {
-      errorMsg.innerText = "Correo o contraseña incorrectos";
-    }
+      await signInWithEmailAndPassword(auth, document.getElementById("email").value, document.getElementById("password").value);
+    } catch (e) { errorMsg.innerText = "Datos incorrectos"; }
   };
 </script>
 </body>

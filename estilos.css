@@ -1,0 +1,32 @@
+/* estilos.css */
+body { font-family: 'Segoe UI', sans-serif; background: #111; color: white; margin: 0; text-align: center; user-select: none; }
+
+/* Navegación */
+nav { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: #1a1a1a; border-bottom: 1px solid #333; position: sticky; top: 0; z-index: 1000; }
+.btn-nav { text-decoration: none; font-weight: bold; font-size: 0.9rem; padding: 8px 15px; border-radius: 6px; border: none; cursor: pointer; color: white; background: #444; }
+.btn-logout { background: #e63946; }
+
+/* Contenedores */
+.container { max-width: 600px; margin: 20px auto; padding: 15px; box-sizing: border-box; }
+
+/* Info Huayno */
+.info-huayno { background: #222; padding: 20px; border-radius: 12px; margin-bottom: 20px; border-left: 6px solid #e63946; text-align: left; }
+.tonalidad-tag { background: #e63946; color: white; padding: 3px 10px; border-radius: 4px; font-size: 0.8em; font-weight: bold; display: inline-block; margin-bottom: 10px; }
+
+/* Reproductor */
+.video-wrapper { position: relative; width: 100%; padding-top: 56.25%; background: #000; border-radius: 12px; overflow: hidden; }
+#player { position: absolute; top: -12%; left: -2%; width: 104%; height: 124%; }
+.capa-blindada { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 20; background: rgba(0,0,0,0); cursor: default; }
+
+/* Controles */
+.controles { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 20px; background: #222; padding: 15px; border-radius: 12px; }
+.btn-control { background: #333; color: white; border: none; padding: 15px 5px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; -webkit-tap-highlight-color: transparent; }
+.btn-control:active { background: #e63946; transform: scale(0.95); }
+.btn-play { background: #e63946; grid-column: span 2; font-size: 1.2rem; margin-bottom: 5px; }
+.btn-full { grid-column: span 2; background: #444; }
+
+/* Expulsión */
+.expulsion-card { background: #1a1a1a; border: 2px solid #e63946; padding: 40px 20px; border-radius: 20px; margin-top: 50px; box-shadow: 0 0 30px rgba(230, 57, 70, 0.4); }
+.expulsion-card h3 { color: #e63946; font-size: 1.6rem; margin: 0 0 15px 0; }
+.aviso-importante { background: rgba(230, 57, 70, 0.15); padding: 15px; border-radius: 10px; font-size: 0.95rem; color: #ffbaba; margin: 20px 0; border-left: 4px solid #e63946; }
+#segundos-restantes { font-weight: bold; color: #e63946; font-size: 1.5rem; }
