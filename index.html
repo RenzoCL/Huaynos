@@ -5,55 +5,149 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Academia de Trompeta</title>
     <link rel="stylesheet" href="css/estilo.css">
+    <style>
+        /* Estilos específicos para el fondo del Login que no interfieren con el resto */
+        .login-wrapper {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle, #222, #000);
+        }
+        .login-box {
+            background: #1a1a1a;
+            padding: 40px;
+            border-radius: 15px;
+            border: 1px solid #333;
+            text-align: center;
+            width: 90%;
+            max-width: 350px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .login-box h2 {
+            color: #e63946;
+            margin: 10px 0;
+            font-size: 1.8rem;
+        }
+        .login-box p {
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 25px;
+        }
+        .login-input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            background: #111;
+            border: 1px solid #444;
+            color: white;
+            border-radius: 8px;
+            box-sizing: border-box;
+            outline: none;
+        }
+        .login-input:focus {
+            border-color: #e63946;
+        }
+        .btn-login {
+            width: 100%;
+            padding: 15px;
+            background: #e63946;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: 0.3s;
+        }
+        .btn-login:hover {
+            background: #b91d2a;
+        }
+        .error-text {
+            color: #ff4d4d;
+            font-size: 0.8rem;
+            margin-top: 15px;
+            background: rgba(255, 77, 77, 0.1);
+            padding: 8px;
+            border-radius: 5px;
+        }
+        .logo-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
-<body class="login-body">
-    <div style="position: fixed; top: 10px; right: 10px; font-size: 0.6rem; color: #444;">v1.0.2</div>
+<body>
 
-    <div class="login-container">
-        <h1 style="color: #e63946; margin-bottom: 5px;">🎺 ACADEMIA</h1>
-        <p style="color: #888; margin-bottom: 25px; font-size: 0.9rem;">Acceso exclusivo para alumnos</p>
-
+    <div class="login-wrapper">
         <div class="login-box">
-            <input type="email" id="email" placeholder="Correo electrónico">
-            <input type="password" id="password" placeholder="Tu contraseña">
-            <button id="btnLogin">ENTRAR AL SISTEMA</button>
-            <div id="error-msg" style="color: #e63946; font-size: 0.8rem; margin-top: 15px; display: none;">
-                Credenciales incorrectas
+            <div class="logo-icon">🎺</div>
+            <h2>MI ACADEMIA</h2>
+            <p>Ingresa para acceder a tus clases y partituras</p>
+            
+            <input type="email" id="email" placeholder="Correo electrónico" class="login-input">
+            <input type="password" id="password" placeholder="Contraseña" class="login-input">
+            
+            <button id="btnLogin" class="btn-login">INICIAR SESIÓN</button>
+            
+            <div id="error-msg" class="error-text" style="display:none;">
+                Correo o contraseña incorrectos.
             </div>
         </div>
     </div>
 
     <script type="module">
+        // Importamos la configuración de Firebase (asegúrate que esté en la raíz)
         import { auth } from "./firebase.js";
         import { signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
         const btnLogin = document.getElementById("btnLogin");
         const errorMsg = document.getElementById("error-msg");
+        const emailInput = document.getElementById("email");
+        const passInput = document.getElementById("password");
 
-        // 1. SI YA ESTÁ LOGUEADO, ENVIAR AL NUEVO HOME DIRECTAMENTE
+        // 1. Redirección automática si ya hay una sesión activa
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                window.location.replace("home.html"); 
+                // Usamos replace para que no pueda volver atrás al login con el botón del celular
+                window.location.replace("home.html");
             }
         });
 
-        // 2. LÓGICA DE LOGIN
-        btnLogin.onclick = async () => {
-            const email = document.getElementById("email").value;
-            const pass = document.getElementById("password").value;
+        // 2. Lógica de inicio de sesión
+        btnLogin.addEventListener("click", async () => {
+            const email = emailInput.value;
+            const password = passInput.value;
 
-            btnLogin.innerText = "VERIFICANDO...";
+            if (!email || !password) {
+                errorMsg.innerText = "Por favor, completa todos los campos.";
+                errorMsg.style.display = "block";
+                return;
+            }
+
+            btnLogin.innerText = "CARGANDO...";
+            btnLogin.disabled = true;
             errorMsg.style.display = "none";
 
             try {
-                await signInWithEmailAndPassword(auth, email, pass);
-                // El onAuthStateChanged se encargará de la redirección
+                await signInWithEmailAndPassword(auth, email, password);
+                // Si tiene éxito, onAuthStateChanged hará la redirección
             } catch (error) {
-                btnLogin.innerText = "ENTRAR AL SISTEMA";
+                console.error("Error de login:", error.code);
+                btnLogin.innerText = "INICIAR SESIÓN";
+                btnLogin.disabled = false;
                 errorMsg.style.display = "block";
-                console.error("Error de login:", error.message);
+                
+                // Mensajes de error amigables
+                if (error.code === "auth/invalid-credential") {
+                    errorMsg.innerText = "Correo o contraseña incorrectos.";
+                } else if (error.code === "auth/too-many-requests") {
+                    errorMsg.innerText = "Demasiados intentos. Intenta más tarde.";
+                } else {
+                    errorMsg.innerText = "Ocurrió un error al ingresar.";
+                }
             }
-        };
+        });
     </script>
 </body>
 </html>
