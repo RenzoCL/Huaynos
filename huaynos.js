@@ -33,15 +33,15 @@ export const baseDeHuaynos = {
     "33": { titulo: "Linda Andahuaylina", artista: "Banda Show Sinfónica Sunicancha", tonalidad: "Mi menor", videoId: "1LCDzUq_FQM", inicio: 4 },
     "34": { titulo: "Linda Huaracina", artista: "Banda Show Filarmónica Llipa", tonalidad: "Mi menor", videoId: "61L6WUdSI34", inicio: 39 },
     "35": { titulo: "Mujer Carhuacina", artista: "Banda Show La Huaranchal", tonalidad: "Mi menor", videoId: "KH2mZ1yqwjY", inicio: 133 },
-    "36": { titulo: "Pájaro Pájaro Pájaro", artista: "Banda Internacional Santa Cecilia de Cátac", tonalidad: "Mi menor", videoId: "UyTd7c-rpEI", inicio: 47 }, // Artista no visible en imagen
+    "36": { titulo: "Pájaro Pájaro Pájaro", artista: "Banda Internacional Santa Cecilia de Cátac", tonalidad: "Mi menor", videoId: "UyTd7c-rpEI", inicio: 47 },
     "37": { titulo: "Perdóname", artista: "Banda Show La Huaranchal", tonalidad: "Mi menor", videoId: "LxQn8yEj0_g", inicio: 31 },
     "38": { titulo: "Por Que Me Dices Que Te Vas", artista: "Banda Filarmónica Star Sayan", tonalidad: "Mi menor", videoId: "3FkTXhdiCD0", inicio: 17 },
-    "39": { titulo: "Puente de Marcará", artista: "Banda Show La Huaranchal", tonalidad: "Mi menor", videoId: "KH2mZ1yqwjY", inicio: 0 }, // Mismo video que Mujer Carhuacina
+    "39": { titulo: "Puente de Marcará", artista: "Banda Show La Huaranchal", tonalidad: "Mi menor", videoId: "KH2mZ1yqwjY", inicio: 0 },
     "40": { titulo: "Que Linda Flor", artista: null, tonalidad: "Mi menor", videoId: null, inicio: 0 }, // Pendiente de imagen y link
     "41": { titulo: "Rio Santa", artista: "Banda Star Pomapata", tonalidad: "Mi menor", videoId: "bnZrU9lUaRk", inicio: 6 },
-    "42": { titulo: "Rosaura Lindaura", artista: null, tonalidad: "Mi menor", videoId: "4MENUlUsDyM", inicio: 20 }, // Artista no visible en imagen
+    "42": { titulo: "Rosaura Lindaura", artista: "Banda Show La Nueva Huaranchal", tonalidad: "Mi menor", videoId: "4MENUlUsDyM", inicio: 20 },
     "43": { titulo: "Tomaré Para Olvidarte", artista: null, tonalidad: "Mi menor", videoId: null, inicio: 0 }, // Pendiente de imagen y link
-    "44": { titulo: "Un Domingo Yo La Vi", artista: "Banda Orquesta Social Huancaya (BOSH)", tonalidad: "Mi menor", videoId: "w9ivCkukPqc", inicio: 91 }, // Imagen indica Banda BOSH
+    "44": { titulo: "Un Domingo Yo La Vi", artista: "Banda Orquesta Social Huancaya (BOSH)", tonalidad: "Mi menor", videoId: "w9ivCkukPqc", inicio: 91 },
     "45": { titulo: "Valicha", artista: "Banda Show La Huaranchal", tonalidad: "Mi menor", videoId: "hW96xU1Ykps", inicio: 0 }, // De tu código original
     "46": { titulo: "Yo Nací Solo Para Ti", artista: null, tonalidad: "Mi menor", videoId: null, inicio: 0 }, // Pendiente de imagen y link
 
