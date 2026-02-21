@@ -40,14 +40,15 @@
       position: relative; display: flex; align-items: center; justify-content: center;
     }
 
-    /* ESCUDOS PROTECTORES */
-    .escudo-superior { position: absolute; top: 0; left: 0; width: 100%; height: 55px; z-index: 10; background: transparent; }
-    .escudo-inferior { position: absolute; bottom: 0; left: 0; width: 100%; height: 40px; z-index: 10; background: transparent; }
-    
-    /* CAPA ANTI DOBLE CLIC */
-    #capa-protectora {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      z-index: 5; background: transparent;
+    /* ESCUDOS PROTECTORES (SOLO ARRIBA Y ABAJO) */
+    /* El centro queda libre para que el "Play" funcione perfectamente */
+    .escudo-superior { 
+      position: absolute; top: 0; left: 0; width: 100%; height: 50px; 
+      z-index: 10; background: transparent; 
+    }
+    .escudo-inferior { 
+      position: absolute; bottom: 0; left: 0; width: 100%; height: 40px; 
+      z-index: 10; background: transparent; 
     }
 
     iframe { width: 100%; height: 100%; border: none; z-index: 1; }
@@ -194,20 +195,15 @@
       <div id="player-container">
         <div class="escudo-superior"></div>
         <div class="escudo-inferior"></div>
-        <div id="capa-protectora"></div>
 
         ${d.videoId ? 
-          `<iframe id="video-frame" src="https://www.youtube.com/embed/${d.videoId}?start=${d.inicio}&rel=0&modestbranding=1&controls=1&disablekb=0&iv_load_policy=3" allow="autoplay"></iframe>` 
+          `<iframe 
+            src="https://www.youtube.com/embed/${d.videoId}?start=${d.inicio}&rel=0&modestbranding=1&controls=1&disablekb=0&iv_load_policy=3" 
+            allow="autoplay">
+          </iframe>` 
           : "<div style='padding:40px;'>Video no vinculado aún 🎺</div>"}
       </div>
     `;
-
-    const capa = document.getElementById("capa-protectora");
-    if(capa) {
-      capa.addEventListener('mousedown', function(e) {
-        if (e.detail > 1) e.preventDefault();
-      });
-    }
   }
 
   window.globalLogout = async () => {
@@ -216,6 +212,7 @@
     window.location.href = "index.html";
   };
 
+  // Bloqueos de teclado
   document.addEventListener('keydown', event => {
     if (event.ctrlKey && (event.key === 'u' || event.key === 's')) event.preventDefault();
     if (event.key.toLowerCase() === 'f') event.preventDefault();
