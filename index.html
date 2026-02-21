@@ -7,54 +7,61 @@
   <style>
     body { font-family: sans-serif; background: #111; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
     .login-box { background: #222; padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); text-align: center; width: 300px; }
-    input { width: 100%; padding: 10px; margin: 10px 0; border-radius: 6px; border: none; box-sizing: border-box; }
-    button { width: 100%; padding: 10px; background: #e63946; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+    input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 6px; border: none; box-sizing: border-box; font-size: 16px; }
+    button { width: 100%; padding: 12px; background: #e63946; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 10px; }
+    button:active { transform: scale(0.98); }
   </style>
 </head>
 <body>
 
 <div class="login-box">
-  <h2>Ingreso Alumnos</h2>
+  <h2 style="margin-top:0;">Ingreso Alumnos</h2>
   <input type="email" id="email" placeholder="Correo electrónico">
   <input type="password" id="password" placeholder="Contraseña">
   <button id="btnLogin">Entrar</button>
-  <p id="error" style="color: #ff4d4d; font-size: 0.8rem;"></p>
+  <p id="error" style="color: #ff4d4d; font-size: 0.8rem; min-height: 1.2em; margin-top: 10px;"></p>
 </div>
 
 <script type="module">
   import { auth } from "./firebase.js";
   import { signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-  // SI YA ESTABA LOGUEADO, REDIRIGIR DE INMEDIATO
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      redirigirSegunMemoria();
-    }
-  });
-
   const btnLogin = document.getElementById("btnLogin");
   const emailInput = document.getElementById("email");
   const passInput = document.getElementById("password");
   const errorMsg = document.getElementById("error");
 
+  // FUNCIÓN ÚNICA DE REDIRECCIÓN
+  function ejecutarRedireccion() {
+    const destinoId = localStorage.getItem("proximoHuayno");
+    
+    if (destinoId && destinoId !== "null" && destinoId !== "undefined") {
+      // Si hay un ID guardado, lo borramos de la memoria y saltamos al video
+      localStorage.removeItem("proximoHuayno");
+      window.location.replace(`huayno.html?id=${destinoId}`);
+    } else {
+      // Si no hay nada guardado, vamos al home normal
+      window.location.replace("home.html");
+    }
+  }
+
+  // DETECTAR SI YA ESTÁ LOGUEADO
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      ejecutarRedireccion();
+    }
+  });
+
+  // LOGUEARSE AL HACER CLIC
   btnLogin.onclick = async () => {
+    errorMsg.innerText = "Validando...";
     try {
       await signInWithEmailAndPassword(auth, emailInput.value, passInput.value);
-      redirigirSegunMemoria();
+      // No hace falta poner nada aquí, onAuthStateChanged se activará solo
     } catch (error) {
       errorMsg.innerText = "Correo o contraseña incorrectos";
     }
   };
-
-  function redirigirSegunMemoria() {
-    const destinoId = localStorage.getItem("proximoHuayno");
-    if (destinoId) {
-      localStorage.removeItem("proximoHuayno"); // Limpiamos para la próxima
-      window.location.href = `huayno.html?id=${destinoId}`;
-    } else {
-      window.location.href = "home.html";
-    }
-  }
 </script>
 </body>
 </html>
