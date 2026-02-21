@@ -1,5 +1,6 @@
 // huaynos.js - Versión 1.0.2
 export const baseDeHuaynos = {
+    // ... (desde el 1 al 20, igual que antes) ...
     "1": { titulo: "Ayer la vi a mi ex", artista: "Banda Jazz Perú Sunicancha", tonalidad: "La menor", videoId: "FTV-9T8b05I", inicio: 29 },
     "2": { titulo: "Brindaré Por Ti", artista: "Banda Show La Huaranchal", tonalidad: "La menor", videoId: "JfLWXhriLik", inicio: 577 },
     "3": { titulo: "Cajamarquina", artista: "Banda Perú Armonía y Clase (PAC)", tonalidad: "La menor", videoId: "zRM5JhjWxIA", inicio: 16 },
@@ -20,6 +21,31 @@ export const baseDeHuaynos = {
     "18": { titulo: "Otra Vez Me Enamoré", artista: "Banda Monumental de Otuzco", tonalidad: "La menor", videoId: "PLm37Vp6G34", inicio: 70 },
     "19": { titulo: "Pocos Minutos", artista: "Banda Orquesta Corazón de Huandoval", tonalidad: "La menor", videoId: "g54QPheDL8M", inicio: 23 },
     "20": { titulo: "Por el Chiquito", artista: "Banda Jazz Perú Sunicancha", tonalidad: "La menor", videoId: "jrnCtIbc6_E", inicio: 189 },
+
+    // --- Huaynos en Mi menor (del 21 al 46) ---
+    "26": { titulo: "A Los Filos De Un Cuchillo", artista: "Banda Show La Huaranchal", tonalidad: "Mi menor", videoId: "AA7wKyslXo0", inicio: 230 },
+    "27": { titulo: "Busco un Amor", artista: "Banda Centro Musical Pomapata", tonalidad: "Mi menor", videoId: "GpcHdt6tSxU", inicio: 16 },
+    "28": { titulo: "Dejame", artista: null, tonalidad: "Mi menor", videoId: null, inicio: 0 }, // Pendiente de imagen y link
+    "29": { titulo: "Dos Cervezas Más", artista: "Banda Nueva Expresión Pomapata", tonalidad: "Mi menor", videoId: "wXtriwE3OXw", inicio: 16 },
+    "30": { titulo: "El Amor de mi Vida", artista: "Banda Orquesta JJ Show", tonalidad: "Mi menor", videoId: "RSfG7B_Bs40", inicio: 32 },
+    "31": { titulo: "Hay Niveles", artista: "Banda Show La Huaranchal", tonalidad: "Mi menor", videoId: "JfLWXhriLik", inicio: 37 },
+    "32": { titulo: "La Cadena Se Rompió", artista: "Banda Show La Huaranchal", tonalidad: "Mi menor", videoId: "CfD_i6oP7SE", inicio: 23 },
+    "33": { titulo: "Linda Andahuaylina", artista: "Banda Show Sinfónica Sunicancha", tonalidad: "Mi menor", videoId: "1LCDzUq_FQM", inicio: 4 },
+    "34": { titulo: "Linda Huaracina", artista: "Banda Show Filarmónica Llipa", tonalidad: "Mi menor", videoId: "61L6WUdSI34", inicio: 39 },
+    "35": { titulo: "Mujer Carhuacina", artista: "Banda Show La Huaranchal", tonalidad: "Mi menor", videoId: "KH2mZ1yqwjY", inicio: 133 },
+    "36": { titulo: "Pájaro Pájaro Pájaro", artista: null, tonalidad: "Mi menor", videoId: "UyTd7c-rpEI", inicio: 47 }, // Artista no visible en imagen
+    "37": { titulo: "Perdóname", artista: "Banda Show La Huaranchal", tonalidad: "Mi menor", videoId: "LxQn8yEj0_g", inicio: 31 },
+    "38": { titulo: "Por Que Me Dices Que Te Vas", artista: "Banda Filarmónica Star Sayan", tonalidad: "Mi menor", videoId: "3FkTXhdiCD0", inicio: 17 },
+    "39": { titulo: "Puente de Marcará", artista: "Banda Show La Huaranchal", tonalidad: "Mi menor", videoId: "KH2mZ1yqwjY", inicio: 0 }, // Mismo video que Mujer Carhuacina
+    "40": { titulo: "Que Linda Flor", artista: null, tonalidad: "Mi menor", videoId: null, inicio: 0 }, // Pendiente de imagen y link
+    "41": { titulo: "Rio Santa", artista: "Banda Star Pomapata", tonalidad: "Mi menor", videoId: "bnZrU9lUaRk", inicio: 6 },
+    "42": { titulo: "Rosaura Lindaura", artista: null, tonalidad: "Mi menor", videoId: "4MENUlUsDyM", inicio: 20 }, // Artista no visible en imagen
+    "43": { titulo: "Tomaré Para Olvidarte", artista: null, tonalidad: "Mi menor", videoId: null, inicio: 0 }, // Pendiente de imagen y link
+    "44": { titulo: "Un Domingo Yo La Vi", artista: "Banda Orquesta Social Huancaya (BOSH)", tonalidad: "Mi menor", videoId: "w9ivCkukPqc", inicio: 91 }, // Imagen indica Banda BOSH
+    "45": { titulo: "Valicha", artista: "Banda Show La Huaranchal", tonalidad: "Mi menor", videoId: "hW96xU1Ykps", inicio: 0 }, // De tu código original
+    "46": { titulo: "Yo Nací Solo Para Ti", artista: null, tonalidad: "Mi menor", videoId: null, inicio: 0 }, // Pendiente de imagen y link
+
+    // --- Huaynos en Re menor (del 47 al 63) ---
     "47": { titulo: "Ábreme La Puerta", artista: "Banda Orquesta Social Huancaya (BOSH)", tonalidad: "Re menor", videoId: "Pl7GewQdlhg", inicio: 24 },
     "48": { titulo: "Amor Por Internet", artista: "Banda Orquesta Corazón de Huandoval", tonalidad: "Re menor", videoId: "A8LRNb7pz8E", inicio: 23 },
     "49": { titulo: "Cajamarquina", artista: "Banda Show La Huaranchal", tonalidad: "Re menor", videoId: null, inicio: 0 },
@@ -29,6 +55,30 @@ export const baseDeHuaynos = {
     "53": { titulo: "La Proforma", artista: "Banda Show Espectáculo Quivilla", tonalidad: "Re menor", videoId: "-rX5D7HEjNI", inicio: 550 },
     "54": { titulo: "Lloro Por Tu Amor", artista: "Banda Show La Huaranchal", tonalidad: "Re menor", videoId: "XZbuk64FDMI", inicio: 0 },
     "55": { titulo: "Márchate", artista: "Banda Show Espectáculo Quivilla", tonalidad: "Re menor", videoId: "MO8Ctj3oC9E", inicio: 23 },
-    "56": { titulo: "Mujer Carhuacina", artista: "Banda Monumental de Huaraz", tonalidad: "Re menor", videoId: "kBvo6XCM_ug", inicio: 557 }
-    // ... continúa con los huaynos restantes (21-46, 57-81) cuando tengas los datos
+    "56": { titulo: "Me Estás Sacando La Vuelta", artista: "Banda Monumental de Huaraz", tonalidad: "Re menor", videoId: "kBvo6XCM_ug", inicio: 557 },
+    "57": { titulo: "Mujer Carhuacina", artista: null, tonalidad: "Re menor", videoId: null, inicio: 0 }, // Pendiente de datos
+    "58": { titulo: "No Me Preguntes Por Ella", artista: "Banda Orquesta Social Huancaya (BOSH)", tonalidad: "Re menor", videoId: "cV5ZcytWfJ8", inicio: 328 },
+    "59": { titulo: "Pásame La Cerveza", artista: "Banda Show La Huaranchal", tonalidad: "Re menor", videoId: "MO8Ctj3oC9E", inicio: 23 }, // Mismo link que Márchate? Verificar
+    "60": { titulo: "Por Ti", artista: "Banda Show Espectáculo Quivilla", tonalidad: "Re menor", videoId: "Pl7GewQdlhg", inicio: 24 }, // Mismo link que Ábreme La Puerta? Verificar
+    "61": { titulo: "Soledad", artista: "Banda Orquesta Social Huancaya (BOSH)", tonalidad: "Re menor", videoId: "cV5ZcytWfJ8", inicio: 328 },
+    "62": { titulo: "Todo Empezó Como Jugando", artista: null, tonalidad: "Re menor", videoId: null, inicio: 0 }, // Pendiente de datos
+    "63": { titulo: "Un Domingo Yo La Vi", artista: null, tonalidad: "Re menor", videoId: null, inicio: 0 }, // Pendiente de datos
+    "64": { titulo: "Amigo", artista: null, tonalidad: "Sol menor", videoId: null, inicio: 0 },
+    "65": { titulo: "Aquella Tarde", artista: null, tonalidad: "Sol menor", videoId: null, inicio: 0 },
+    "66": { titulo: "Brindaré Por Ti", artista: null, tonalidad: "Sol menor", videoId: null, inicio: 0 },
+    "67": { titulo: "Chofercito Carretero", artista: null, tonalidad: "Sol menor", videoId: null, inicio: 0 },
+    "68": { titulo: "Don Mario", artista: null, tonalidad: "Sol menor", videoId: null, inicio: 0 },
+    "69": { titulo: "Hay Niveles", artista: null, tonalidad: "Sol menor", videoId: null, inicio: 0 },
+    "70": { titulo: "La Cadena Se Rompió", artista: null, tonalidad: "Sol menor", videoId: null, inicio: 0 },
+    "71": { titulo: "La Chismosa", artista: null, tonalidad: "Sol menor", videoId: null, inicio: 0 },
+    "72": { titulo: "Madre", artista: null, tonalidad: "Sol menor", videoId: null, inicio: 0 },
+    "73": { titulo: "Mary se Llama", artista: null, tonalidad: "Sol menor", videoId: null, inicio: 0 },
+    "74": { titulo: "Me Emborracho Por Tu Amor", artista: null, tonalidad: "Sol menor", videoId: null, inicio: 0 },
+    "75": { titulo: "Mix Flor Piña", artista: null, tonalidad: "Sol menor", videoId: null, inicio: 0 },
+    "76": { titulo: "No Puedo Amarte", artista: null, tonalidad: "Sol menor", videoId: null, inicio: 0 },
+    "77": { titulo: "Otra Vez Me Enamoré", artista: null, tonalidad: "Sol menor", videoId: null, inicio: 0 },
+    "78": { titulo: "Que Linda Flor", artista: null, tonalidad: "Sol menor", videoId: null, inicio: 0 },
+    "79": { titulo: "Viaje de Amor", artista: null, tonalidad: "Sol menor", videoId: null, inicio: 0 },
+    "80": { titulo: "Vizcachita", artista: null, tonalidad: "Sol menor", videoId: null, inicio: 0 },
+    "81": { titulo: "Ya Se Marchó", artista: null, tonalidad: "Sol menor", videoId: null, inicio: 0 }
 };
