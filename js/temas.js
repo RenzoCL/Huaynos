@@ -27,7 +27,7 @@ export const baseDeTemas = {
     "25": { titulo: "Vizcachita",                   artista: "Banda Show Filarmmónica Llipa",               tonalidad: "La menor", videoId: "Tu7PjXcFnHY", inicio: 24, categoria: "huayno" },
     "26": { titulo: "A Los Filos De Un Cuchillo",   artista: "Banda Show La Huaranchal",                    tonalidad: "Mi menor", videoId: "AA7wKyslXo0", inicio: 230, categoria: "huayno" },
     "27": { titulo: "Busco un Amor",                artista: "Banda Centro Musical Pomapata",               tonalidad: "Mi menor", videoId: "GpcHdt6tSxU", inicio: 16, categoria: "huayno" },
-    "28": { titulo: "Déjame",                       artista: null,                                          tonalidad: "Mi menor", videoId: null, inicio: 0, categoria: "huayno" },
+    "28": { titulo: "Déjame",                       artista: "Banda Centro Musical Pomapata",               tonalidad: "Mi menor", videoId: "iGo-vGi5L8g", inicio: 352, categoria: "huayno" },
     "29": { titulo: "Dos Cervezas Más",             artista: "Banda Nueva Expresión Pomapata",              tonalidad: "Mi menor", videoId: "wXtriwE3OXw", inicio: 16, categoria: "huayno" },
     "30": { titulo: "El Amor de mi Vida",           artista: "Banda Orquesta JJ Show",                      tonalidad: "Mi menor", videoId: "RSfG7B_Bs40", inicio: 32, categoria: "huayno" },
     "31": { titulo: "Hay Niveles",                  artista: "Banda Show La Huaranchal",                    tonalidad: "Mi menor", videoId: "JfLWXhriLik", inicio: 37, categoria: "huayno" },
