@@ -2,38 +2,107 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Biblioteca - Huaynos 🎺</title>
+    
     <link rel="stylesheet" href="estilos.css?v=1.0.2">
+    
     <style>
-        :root { --lam: #ff4d4d; --mim: #4dff88; --rem: #4d94ff; --solm: #ffcc4d; }
-        .buscador { width: 90%; max-width: 400px; padding: 12px; border-radius: 25px; border: 1px solid #444; margin: 20px auto; background: #222; color: white; display: block; }
-        .grid-huaynos { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; max-width: 1000px; margin: auto; padding: 0 15px 40px; }
-        .card { background: #1a1a1a; border-radius: 12px; padding: 15px; cursor: pointer; transition: 0.2s; border-bottom: 4px solid #444; text-decoration: none; color: white; display: flex; flex-direction: column; height: 85px; justify-content: center; }
-        .card:hover { transform: scale(1.03); background: #252525; }
-        /* Clases de colores para las tarjetas */
-        .la-menor { border-color: var(--lam); } .mi-menor { border-color: var(--mim); }
-        .re-menor { border-color: var(--rem); } .sol-menor { border-color: var(--solm); }
-        .tono-tag { font-size: 0.65em; font-weight: bold; margin-bottom: 5px; opacity: 0.8; text-transform: uppercase; }
-        .titulo { font-size: 0.85em; font-weight: 600; line-height: 1.2; }
+        /* Estilos específicos para la rejilla de canciones */
+        :root { 
+            --lam: #ff4d4d; 
+            --mim: #4dff88; 
+            --rem: #4d94ff; 
+            --solm: #ffcc4d; 
+        }
+
+        .buscador { 
+            width: 90%; 
+            max-width: 400px; 
+            padding: 12px 20px; 
+            border-radius: 25px; 
+            border: 1px solid #444; 
+            margin: 20px auto; 
+            background: #222; 
+            color: white; 
+            display: block; 
+            font-size: 16px;
+            outline: none;
+        }
+
+        .buscador:focus { border-color: #e63946; box-shadow: 0 0 8px rgba(230, 57, 70, 0.3); }
+
+        .grid-huaynos { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); 
+            gap: 15px; 
+            max-width: 1000px; 
+            margin: auto; 
+            padding: 0 20px 50px; 
+        }
+
+        .card { 
+            background: #1a1a1a; 
+            border-radius: 12px; 
+            padding: 15px; 
+            cursor: pointer; 
+            transition: transform 0.2s, background 0.2s; 
+            border-bottom: 4px solid #444; 
+            text-decoration: none; 
+            color: white; 
+            display: flex; 
+            flex-direction: column; 
+            height: 90px; 
+            justify-content: center; 
+            text-align: left;
+        }
+
+        .card:active { transform: scale(0.95); }
+
+        /* Clases dinámicas por tonalidad */
+        .la-menor { border-color: var(--lam); }
+        .mi-menor { border-color: var(--mim); }
+        .re-menor { border-color: var(--rem); }
+        .sol-menor { border-color: var(--solm); }
+
+        .tono-tag { 
+            font-size: 0.65em; 
+            font-weight: bold; 
+            margin-bottom: 6px; 
+            opacity: 0.7; 
+            text-transform: uppercase; 
+            letter-spacing: 1px;
+        }
+
+        .titulo { 
+            font-size: 0.95em; 
+            font-weight: 600; 
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
     </style>
 </head>
 <body oncontextmenu="return false;">
 
-    <div style="position: fixed; top: 10px; right: 10px; font-size: 0.7rem; color: #555; z-index: 9999; font-family: monospace;">
+    <div style="position: fixed; top: 10px; right: 10px; font-size: 0.7rem; color: #555; z-index: 9999; font-family: monospace; background: rgba(0,0,0,0.5); padding: 2px 5px; border-radius: 3px;">
         v1.0.2
     </div>
 
     <nav>
-        <a href="home.html" class="btn-nav btn-inicio">🏠 Inicio</a>
+        <a href="home.html" class="btn-nav">🏠 Inicio</a>
         <button id="btnLogOut" class="btn-nav btn-logout">Cerrar Sesión</button>
     </nav>
 
-    <h2 style="margin-top:20px;">Mi Repertorio 🎺</h2>
-    <input type="text" id="buscador" class="buscador" placeholder="🔎 Buscar huayno o tono...">
+    <h2 style="margin-top:25px; letter-spacing: 1px;">Mi Repertorio 🎺</h2>
+    
+    <input type="text" id="buscador" class="buscador" placeholder="🔎 Buscar canción o tono...">
 
     <div id="main-content">
-        <div class="grid-huaynos" id="lista"></div>
+        <div class="grid-huaynos" id="lista">
+            </div>
     </div>
 
     <script type="module">
@@ -41,7 +110,7 @@
         import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         
-        // IMPORTACIONES MODULARES (Añadimos versión para saltar caché)
+        // IMPORTACIONES MODULARES
         import { baseDeHuaynos } from "./huaynos.js?v=1.0.2";
         import { manejarExpulsion, globalLogout } from "./seguridad.js?v=1.0.2";
 
@@ -53,58 +122,73 @@
         localStorage.setItem("deviceId", deviceId);
         let expulsando = false;
 
-        // Configurar botón de cerrar sesión
+        // Listener para cerrar sesión
         document.getElementById("btnLogOut").onclick = () => {
             expulsando = true;
             globalLogout(auth);
         };
 
+        // Verificación de sesión y protección de doble inicio
         onAuthStateChanged(auth, async (user) => {
-            if (!user && !expulsando) { window.location.href = "index.html"; return; }
-            if (!user) return;
+            if (!user && !expulsando) { 
+                window.location.href = "index.html"; 
+                return; 
+            }
+            
+            if (user) {
+                const sessionRef = doc(db, "sessions", user.uid);
+                await setDoc(sessionRef, { devices: [deviceId] }, { merge: false });
 
-            const sessionRef = doc(db, "sessions", user.uid);
-            await setDoc(sessionRef, { devices: [deviceId] }, { merge: false });
+                onSnapshot(sessionRef, (snap) => {
+                    // Evitar auto-expulsión por latencia de Firebase
+                    if (snap.metadata.hasPendingWrites) return;
 
-            onSnapshot(sessionRef, (snap) => {
-                if (snap.metadata.hasPendingWrites) return;
-                if (!expulsando && snap.exists() && !snap.data().devices.includes(deviceId)) {
-                    expulsando = true;
-                    manejarExpulsion(mainContent, auth);
-                }
-            });
+                    if (!expulsando && snap.exists() && !snap.data().devices.includes(deviceId)) {
+                        expulsando = true;
+                        manejarExpulsion(mainContent, auth);
+                    }
+                });
+            }
         });
 
-        // Función para dibujar las tarjetas (usa la base de datos importada)
+        // Función para renderizar las tarjetas (Solo Título y Tono)
         function render(filtro = "") {
             listaDiv.innerHTML = "";
             
-            // Convertimos el objeto de huaynos en un array para poder filtrarlo
-            const arrayHuaynos = Object.keys(baseDeHuaynos).map(id => ({ id, ...baseDeHuaynos[id] }));
+            // Convertimos el objeto de la DB en un array para filtrar
+            const canciones = Object.keys(baseDeHuaynos).map(id => ({
+                id: id,
+                ...baseDeHuaynos[id]
+            }));
 
-            const filtrados = arrayHuaynos.filter(h => 
-                h.titulo.toLowerCase().includes(filtro.toLowerCase()) || 
-                h.tonalidad.toLowerCase().includes(filtro.toLowerCase())
+            const filtrados = canciones.filter(c => 
+                c.titulo.toLowerCase().includes(filtro.toLowerCase()) || 
+                c.tonalidad.toLowerCase().includes(filtro.toLowerCase()) ||
+                c.artista.toLowerCase().includes(filtro.toLowerCase()) // Permite buscar por banda aunque no se vea
             );
 
-            filtrados.forEach(h => {
+            filtrados.forEach(c => {
                 const card = document.createElement("a");
-                card.href = `huayno.html?id=${h.id}`;
+                card.href = `huayno.html?id=${c.id}`;
                 
-                // Asignar clase de color según tono
-                let claseColor = "la-menor";
-                if(h.tonalidad.includes("Mi menor")) claseColor = "mi-menor";
-                if(h.tonalidad.includes("Re menor")) claseColor = "re-menor";
-                if(h.tonalidad.includes("Sol menor")) claseColor = "sol-menor";
-
-                card.className = `card ${claseColor}`;
-                card.innerHTML = `<span class="tono-tag">${h.tonalidad}</span><span class="titulo">${h.titulo}</span>`;
+                // Normalizar nombre de tonalidad para la clase CSS (ej: "La menor" -> "la-menor")
+                const claseTono = c.tonalidad.toLowerCase().replace(/\s+/g, '-');
+                
+                card.className = `card ${claseTono}`;
+                card.innerHTML = `
+                    <span class="tono-tag">${c.tonalidad}</span>
+                    <span class="titulo">${c.titulo}</span>
+                `;
                 listaDiv.appendChild(card);
             });
         }
 
+        // Evento del buscador
         buscador.addEventListener("input", (e) => render(e.target.value));
-        render(); // Carga inicial
+
+        // Carga inicial
+        render();
+
     </script>
 </body>
 </html>
