@@ -76,8 +76,12 @@ nav {
     text-transform: uppercase;
 }
 
-/* --- Lista de Temas --- */
-.container { padding: 20px; max-width: 800px; margin: auto; }
+/* --- Lista de Temas (CORREGIDO PARA GRID) --- */
+.container { 
+    padding: 20px; 
+    max-width: 1200px; /* Aumentado para que quepan más cuadros en PC */
+    margin: auto; 
+}
 
 .buscador {
     width: 100%;
@@ -88,41 +92,67 @@ nav {
     color: white;
     margin-bottom: 20px;
     box-sizing: border-box;
+    position: sticky; /* Opcional: Buscador siempre visible al bajar */
+    top: 70px;
+    z-index: 900;
 }
 
 .grid-huaynos {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: 12px;
+    /* MAGIA AQUÍ: Crea columnas automáticas según el ancho de pantalla */
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 15px;
+}
+
+/* Adaptación para tablets y PCs */
+@media (min-width: 768px) {
+    .grid-huaynos {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 20px;
+    }
 }
 
 .card {
     display: flex;
+    flex-direction: column; /* Cambiado de row a column para estilo cuadro */
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     padding: 15px;
     background: #222;
-    border-radius: 8px;
+    border-radius: 12px;
     text-decoration: none;
     color: white;
     border-left: 5px solid #444;
     transition: 0.2s;
+    min-height: 110px; /* Altura mínima para uniformidad */
 }
 
-.card:hover { background: #2a2a2a; }
+.card:hover { 
+    background: #2a2a2a; 
+    transform: scale(1.02);
+}
 
-/* Colores por Tonalidad */
+/* Colores por Tonalidad (Mantengo tus colores) */
 .la-menor { border-left-color: #e63946; }
 .mi-menor { border-left-color: #2a9d8f; }
 .re-menor { border-left-color: #457b9d; }
 .sol-menor { border-left-color: #f4a261; }
 .metodo-style { border-left-color: #8338ec; }
 
+.titulo {
+    font-weight: bold;
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+    line-height: 1.2;
+}
+
 .tono-tag {
+    align-self: flex-end; /* Manda la nota a la esquina inferior derecha */
     font-size: 0.7rem;
     background: rgba(255,255,255,0.1);
     padding: 4px 8px;
     border-radius: 4px;
+    font-weight: bold;
 }
 
 /* --- Reproductor --- */
