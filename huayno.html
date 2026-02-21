@@ -42,7 +42,12 @@
   const content = document.getElementById("content");
   const logoutBtn = document.getElementById("logoutBtn");
 
-  const deviceId = crypto.randomUUID();
+  let deviceId = localStorage.getItem("deviceId");
+
+  if (!deviceId) {
+    deviceId = crypto.randomUUID();
+    localStorage.setItem("deviceId", deviceId);
+  }
 
   onAuthStateChanged(auth, async (user) => {
     if (!user) {
