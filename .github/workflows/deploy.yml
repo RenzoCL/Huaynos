@@ -1,8 +1,9 @@
-name: Deploy Ripper Normal
+name: Deploy Ripper
 
 on:
   push:
-    branches: ["main"] # Cambia a "master" si tu rama principal se llama así
+    branches: ["main"]
+  workflow_dispatch: # <--- ESTA LÍNEA te permite lanzar el deploy manualmente
 
 permissions:
   contents: read
