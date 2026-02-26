@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Administrador</title>
+    <link rel="stylesheet" href="css/estilo.css">
+    <style>
+        .form-admin { max-width: 500px; margin: 20px auto; padding: 20px; background: #1a1a1a; border-radius: 15px; border: 1px solid #333; }
+        .form-admin input, .form-admin select { width: 100%; padding: 10px; margin: 8px 0; background: #222; border: 1px solid #444; color: white; border-radius: 8px; box-sizing: border-box; }
+        .btn-save { width: 100%; padding: 15px; background: #e63946; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        
+        .tabla-temas { max-width: 800px; margin: 40px auto; width: 100%; border-collapse: collapse; background: #111; font-size: 0.9rem; }
+        .tabla-temas th, .tabla-temas td { padding: 12px; border: 1px solid #333; text-align: left; }
+        .btn-edit { background: #2196F3; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-right: 5px; }
+        .btn-delete { background: #f44336; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <nav><a href="home.html" style="color:white; padding: 20px; display: block;">⬅ Volver al Inicio</a></nav>
+    
+    <div class="form-admin">
+        <h2 id="form-title">Añadir Nuevo Tema</h2>
+        <input type="hidden" id="edit-id"> <input type="text" id="titulo" placeholder="Título">
+        <input type="text" id="artista" placeholder="Artista">
+        <input type="text" id="tonalidad" placeholder="Tonalidad (ej: La menor)">
+        <input type="text" id="videoId" placeholder="ID del Video">
+        <input type="number" id="inicio" placeholder="Segundo de inicio">
+        
+        <select id="categoria">
+            <option value="huayno">Huayno</option>
+            <option value="salay">Salay</option>
+            <option value="cumbia">Cumbia</option>
+        </select>
+
+        <select id="fuente">
+            <option value="youtube">YouTube</option>
+            <option value="drive">Google Drive</option>
+        </select>
+
+        <button id="btnGuardar" class="btn-save">GUARDAR TEMA</button>
+        <button id="btnCancelar" style="display:none; width:100%; background:none; color:gray; border:none; margin-top:10px; cursor:pointer;">Cancelar Edición</button>
+        <p id="status" style="text-align:center;"></p>
+    </div>
+
+    <table class="tabla-temas">
+        <thead>
+            <tr>
+                <th>Título</th>
+                <th>Artista</th>
+                <th>Tonalidad</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="cuerpo-tabla">
+            </tbody>
+    </table>
+
+    <script type="module">
+        // Importamos 'auth' además de 'db'
+        import { db, auth } from "./firebase.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // --- CONFIGURACIÓN DE SEGURIDAD ---
+        const ADMIN_EMAIL = "admin@ripper.com"; // 👈 PON AQUÍ TU CORREO EXACTO
+        const cuerpoTabla = document.getElementById("cuerpo-tabla");
+        const btnGuardar = document.getElementById("btnGuardar");
+        const btnCancelar = document.getElementById("btnCancelar");
+
+        // 0. VERIFICAR SI ES EL ADMIN
+        onAuthStateChanged(auth, (user) => {
+            if (user && user.email === ADMIN_EMAIL) {
+                console.log("Acceso autorizado");
+                cargarLista(); // Solo carga los datos si eres tú
+            } else {
+                alert("CHISTOSO. No tienes permiso para estar aquí.");
+                window.location.href = "home.html"; // Redirige a los intrusos
+            }
+        });
+            // --- 1. CARGAR LISTA DE TEMAS ---
+            async function cargarLista() {
+                cuerpoTabla.innerHTML = "<tr><td colspan='4'>Cargando temas...</td></tr>";
+                const snap = await getDocs(collection(db, "temas"));
+                cuerpoTabla.innerHTML = "";
+
+                snap.forEach(documento => {
+                    const t = documento.data();
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td>${t.titulo}</td>
+                        <td>${t.artista}</td>
+                        <td>${t.tonalidad}</td>
+                        <td>
+                            <button class="btn-edit" onclick="prepararEdicion('${documento.id}')">Editar</button>
+                            <button class="btn-delete" onclick="eliminarTema('${documento.id}')">Eliminar</button>
+                        </td>
+                    `;
+                    cuerpoTabla.appendChild(tr);
+                });
+            }
+
+        // --- 2. GUARDAR O ACTUALIZAR ---
+        btnGuardar.onclick = async () => {
+            const idParaEditar = document.getElementById("edit-id").value;
+            const data = {
+                titulo: document.getElementById("titulo").value,
+                artista: document.getElementById("artista").value,
+                tonalidad: document.getElementById("tonalidad").value,
+                videoId: document.getElementById("videoId").value,
+                inicio: parseInt(document.getElementById("inicio").value) || 0,
+                categoria: document.getElementById("categoria").value,
+                fuente: document.getElementById("fuente").value
+            };
+
+            try {
+                if (idParaEditar) {
+                    // ACTUALIZAR
+                    await updateDoc(doc(db, "temas", idParaEditar), data);
+                    alert("¡Actualizado!");
+                } else {
+                    // CREAR NUEVO
+                    await addDoc(collection(db, "temas"), data);
+                    alert("¡Creado!");
+                }
+                limpiarFormulario();
+                cargarLista();
+            } catch (e) { alert("Error: " + e.message); }
+        };
+
+        // --- 3. PREPARAR EDICIÓN (Cargar datos al formulario) ---
+        window.prepararEdicion = async (id) => {
+            const snap = await getDocs(collection(db, "temas"));
+            const tema = snap.docs.find(d => d.id === id).data();
+
+            document.getElementById("edit-id").value = id;
+            document.getElementById("titulo").value = tema.titulo;
+            document.getElementById("artista").value = tema.artista;
+            document.getElementById("tonalidad").value = tema.tonalidad;
+            document.getElementById("videoId").value = tema.videoId;
+            document.getElementById("inicio").value = tema.inicio;
+            document.getElementById("categoria").value = tema.categoria;
+            document.getElementById("fuente").value = tema.fuente;
+
+            document.getElementById("form-title").innerText = "Editando Tema";
+            btnGuardar.innerText = "ACTUALIZAR CAMBIOS";
+            btnCancelar.style.display = "block";
+            window.scrollTo(0,0);
+        };
+
+        // --- 4. ELIMINAR ---
+        window.eliminarTema = async (id) => {
+            if(confirm("¿Seguro que quieres borrar este tema?")) {
+                await deleteDoc(doc(db, "temas", id));
+                cargarLista();
+            }
+        };
+
+        function limpiarFormulario() {
+            document.querySelectorAll("input").forEach(i => i.value = "");
+            document.getElementById("edit-id").value = "";
+            document.getElementById("form-title").innerText = "Añadir Nuevo Tema";
+            btnGuardar.innerText = "GUARDAR TEMA";
+            btnCancelar.style.display = "none";
+        }
+
+        btnCancelar.onclick = limpiarFormulario;
+
+        // Carga inicial
+        cargarLista();
+    </script>
+</body>
+</html>
